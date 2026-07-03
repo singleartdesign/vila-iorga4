@@ -5,7 +5,89 @@ import { useRouter } from 'next/navigation'
 
 const LUNI_NUME = ['','Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Nov','Dec']
 const CULORI = ['#e07b39','#2563a8','#059669','#7c3aed','#b91c1c']
-const CULORI_LIGHT = ['rgba(224,123,57,0.2)','rgba(37,99,168,0.2)','rgba(5,150,105,0.2)','rgba(124,58,237,0.2)','rgba(185,28,28,0.2)']
+const CULORI_LIGHT = ['rgba(224,123,57,0.25)','rgba(37,99,168,0.25)','rgba(5,150,105,0.25)','rgba(124,58,237,0.25)','rgba(185,28,28,0.25)']
+
+function MiniBarChart({ data, valueKey, color, colorLight, unit, height=140 }) {
+  const vals = data.map(d => d[valueKey] || 0)
+  const maxVal = Math.max(...vals, 1)
+  const minVal = Math.max(0, Math.min(...vals.filter(v=>v>0)) * 0.7)
+  const range = maxVal - minVal || 1
+
+  return (
+    <div style={{overflowX:'auto', WebkitOverflowScrolling:'touch'}}>
+      <div style={{display:'flex', alignItems:'flex-end', gap:6, height, minWidth: data.length * 42, padding:'4px 4px 0'}}>
+        {data.map((item, i) => {
+          const val = item[valueKey] || 0
+          const h = val > 0 ? Math.max(((val - minVal) / range) * (height - 36), 8) : 0
+          const isLast = i === data.length - 1
+          return (
+            <div key={i} style={{display:'flex', flexDirection:'column', alignItems:'center', gap:3, minWidth:34, flex:1}}>
+              <div style={{fontSize:9, fontWeight:700, height:14, display:'flex', alignItems:'flex-end',
+                color: isLast ? color : 'var(--text3)'}}>
+                {isLast ? (unit === 'RON' ? Math.round(val) : val) : ''}
+              </div>
+              <div style={{
+                width:26, borderRadius:'5px 5px 0 0',
+                background: isLast ? color : colorLight,
+                height: h, minHeight: val > 0 ? 4 : 0,
+                transition:'height 0.3s'
+              }}></div>
+              <div style={{fontSize:9, color:'var(--text3)', fontWeight:600, textAlign:'center', lineHeight:1.2}}>
+                {LUNI_NUME[item.luna]}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+function ProprietarChart({ luni, citiri, apartamente, height=160 }) {
+  if (!luni.length || !apartamente.length) return null
+  const allConsumuri = citiri.map(c => c.consum || 0).filter(v => v > 0)
+  const maxVal = Math.max(...allConsumuri, 1)
+
+  return (
+    <div style={{overflowX:'auto', WebkitOverflowScrolling:'touch'}}>
+      <div style={{display:'flex', alignItems:'flex-end', gap:4, height, minWidth: luni.length * 52, padding:'4px 4px 0'}}>
+        {luni.map((luna, li) => {
+          const citiriLuna = citiri.filter(c => c.luna_id === luna.id)
+          const isLast = li === luni.length - 1
+          return (
+            <div key={luna.id} style={{display:'flex', flexDirection:'column', alignItems:'center', flex:1, minWidth:46}}>
+              <div style={{display:'flex', alignItems:'flex-end', gap:2, flex:1, width:'100%'}}>
+                {apartamente.map((apt, ai) => {
+                  const citire = citiriLuna.find(c => c.apartament_id === apt.id)
+                  const consum = citire?.consum || 0
+                  const h = Math.max((consum / maxVal) * (height - 30), consum > 0 ? 4 : 0)
+                  return (
+                    <div key={apt.id} style={{
+                      flex:1, borderRadius:'3px 3px 0 0',
+                      background: isLast ? CULORI[ai%5] : CULORI_LIGHT[ai%5],
+                      height: h
+                    }}/>
+                  )
+                })}
+              </div>
+              <div style={{fontSize:8, color: isLast ? 'var(--t1)' : 'var(--text3)', fontWeight:700, marginTop:3, textAlign:'center'}}>
+                {LUNI_NUME[luna.luna]}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+      <div style={{display:'flex', gap:10, marginTop:8, flexWrap:'wrap'}}>
+        {apartamente.map((apt, i) => (
+          <div key={apt.id} style={{display:'flex', alignItems:'center', gap:5, fontSize:10, color:'var(--text3)'}}>
+            <div style={{width:10, height:10, borderRadius:2, background:CULORI[i%5]}}></div>
+            {apt.proprietar_nume.split(' ')[0]}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 export default function Dashboard() {
   const [profile, setProfile] = useState(null)
@@ -64,12 +146,11 @@ export default function Dashboard() {
   const nrRestante = plati.filter(p => (p.suma_calculata || 0) > (p.suma_platita || 0)).length
   const lunaNume = lunaActuala ? `${LUNI_NUME[lunaActuala.luna]} ${lunaActuala.an}` : ''
 
-  const maxConsum = Math.max(...istoricLuni.map(l => l.consum_facturat), 1)
-  const maxValoare = Math.max(...istoricLuni.map(l => l.valoare_factura), 1)
-
   const apartamente = [...new Map(istoricCitiri.map(c => [c.apartament_id, c.apartamente])).values()]
-    .filter(Boolean)
-    .sort((a,b) => a.numar - b.numar)
+    .filter(Boolean).sort((a,b) => a.numar - b.numar)
+
+  const consumData = istoricLuni.map(l => ({ luna: l.luna, an: l.an, consum_facturat: l.consum_facturat }))
+  const valoareData = istoricLuni.map(l => ({ luna: l.luna, an: l.an, valoare_factura: l.valoare_factura }))
 
   return (
     <div style={{minHeight:'100vh',background:'var(--bg)',fontFamily:'Nunito,sans-serif'}}>
@@ -127,22 +208,17 @@ export default function Dashboard() {
         )}
 
         <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:10}}>
-          <div style={{background:'#fff',borderRadius:'var(--r)',padding:'14px 16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
-            <div style={{fontSize:10,color:'var(--text3)',fontWeight:700,textTransform:'uppercase',letterSpacing:0.5,marginBottom:6}}>Colectat</div>
-            <div style={{fontSize:22,fontWeight:800,color:'var(--t1)',fontFamily:'Sora,sans-serif'}}>{totalColectat.toFixed(0)} <span style={{fontSize:13,color:'var(--text3)',fontWeight:500}}>RON</span></div>
-          </div>
-          <div style={{background:'#fff',borderRadius:'var(--r)',padding:'14px 16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
-            <div style={{fontSize:10,color:'var(--text3)',fontWeight:700,textTransform:'uppercase',letterSpacing:0.5,marginBottom:6}}>Restante</div>
-            <div style={{fontSize:22,fontWeight:800,color:nrRestante>0?'#f97316':'var(--t1)',fontFamily:'Sora,sans-serif'}}>{totalRestant.toFixed(0)} <span style={{fontSize:13,color:'var(--text3)',fontWeight:500}}>RON</span></div>
-          </div>
-          <div style={{background:'#fff',borderRadius:'var(--r)',padding:'14px 16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
-            <div style={{fontSize:10,color:'var(--text3)',fontWeight:700,textTransform:'uppercase',letterSpacing:0.5,marginBottom:6}}>Pierdere apa</div>
-            <div style={{fontSize:22,fontWeight:800,color:'#f97316',fontFamily:'Sora,sans-serif'}}>{Math.abs(pierdere).toFixed(2)} <span style={{fontSize:13,color:'var(--text3)',fontWeight:500}}>mc</span></div>
-          </div>
-          <div style={{background:'#fff',borderRadius:'var(--r)',padding:'14px 16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
-            <div style={{fontSize:10,color:'var(--text3)',fontWeight:700,textTransform:'uppercase',letterSpacing:0.5,marginBottom:6}}>Citiri</div>
-            <div style={{fontSize:22,fontWeight:800,color:'var(--l2)',fontFamily:'Sora,sans-serif'}}>{citiri.length} <span style={{fontSize:13,color:'var(--text3)',fontWeight:500}}>din 5</span></div>
-          </div>
+          {[
+            {label:'Colectat',val:totalColectat.toFixed(0),unit:'RON',color:'var(--t1)'},
+            {label:'Restante',val:totalRestant.toFixed(0),unit:'RON',color:nrRestante>0?'#f97316':'var(--t1)'},
+            {label:'Pierdere apa',val:Math.abs(pierdere).toFixed(2),unit:'mc',color:'#f97316'},
+            {label:'Citiri',val:`${citiri.length}/5`,unit:'introduse',color:'var(--l2)'},
+          ].map(s => (
+            <div key={s.label} style={{background:'#fff',borderRadius:'var(--r)',padding:'14px 16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
+              <div style={{fontSize:10,color:'var(--text3)',fontWeight:700,textTransform:'uppercase',letterSpacing:0.5,marginBottom:6}}>{s.label}</div>
+              <div style={{fontSize:22,fontWeight:800,color:s.color,fontFamily:'Sora,sans-serif'}}>{s.val} <span style={{fontSize:12,color:'var(--text3)',fontWeight:500}}>{s.unit}</span></div>
+            </div>
+          ))}
         </div>
 
         <div style={{background:'#fff',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
@@ -176,116 +252,33 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* GRAFIC CONSUM - SCROLLABIL */}
         {istoricLuni.length > 0 && (
           <div style={{background:'#fff',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
               <div style={{fontFamily:'Sora,sans-serif',fontSize:13,fontWeight:700}}>Consum facturat - 12 luni (mc)</div>
-              <div style={{fontSize:10,color:'var(--text3)'}}>← scroll</div>
+              <div style={{fontSize:10,color:'var(--text3)'}}>scroll →</div>
             </div>
-            <div style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
-              <div style={{display:'flex',alignItems:'flex-end',gap:6,height:130,minWidth:istoricLuni.length*40,padding:'8px 4px 0'}}>
-                {istoricLuni.map((luna, i) => {
-                  const h = Math.max((luna.consum_facturat / maxConsum) * 100, 4)
-                  const isLast = i === istoricLuni.length - 1
-                  return (
-                    <div key={luna.id} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:4,minWidth:34}}>
-                      <div style={{fontSize:9,color:'var(--t1)',fontWeight:700,height:14,display:'flex',alignItems:'flex-end'}}>
-                        {isLast ? luna.consum_facturat : ''}
-                      </div>
-                      <div style={{
-                        width:28,borderRadius:'4px 4px 0 0',
-                        background:isLast?'linear-gradient(180deg,var(--t3),var(--t1))':'rgba(20,184,166,0.3)',
-                        height:`${h}%`,minHeight:4
-                      }}></div>
-                      <div style={{fontSize:9,color:'var(--text3)',fontWeight:600,textAlign:'center'}}>
-                        {LUNI_NUME[luna.luna]}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
+            <MiniBarChart data={consumData} valueKey="consum_facturat" color="var(--t1)" colorLight="rgba(20,184,166,0.2)" unit="mc" />
           </div>
         )}
 
-        {/* GRAFIC VALOARE - SCROLLABIL */}
         {istoricLuni.length > 0 && (
           <div style={{background:'#fff',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
               <div style={{fontFamily:'Sora,sans-serif',fontSize:13,fontWeight:700}}>Valoare facturi - 12 luni (RON)</div>
-              <div style={{fontSize:10,color:'var(--text3)'}}>← scroll</div>
+              <div style={{fontSize:10,color:'var(--text3)'}}>scroll →</div>
             </div>
-            <div style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
-              <div style={{display:'flex',alignItems:'flex-end',gap:6,height:130,minWidth:istoricLuni.length*40,padding:'8px 4px 0'}}>
-                {istoricLuni.map((luna, i) => {
-                  const h = Math.max((luna.valoare_factura / maxValoare) * 100, 4)
-                  const isLast = i === istoricLuni.length - 1
-                  return (
-                    <div key={luna.id} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:4,minWidth:34}}>
-                      <div style={{fontSize:9,color:'var(--l2)',fontWeight:700,height:14,display:'flex',alignItems:'flex-end'}}>
-                        {isLast ? luna.valoare_factura?.toFixed(0) : ''}
-                      </div>
-                      <div style={{
-                        width:28,borderRadius:'4px 4px 0 0',
-                        background:isLast?'linear-gradient(180deg,var(--l4),var(--l2))':'rgba(139,92,246,0.25)',
-                        height:`${h}%`,minHeight:4
-                      }}></div>
-                      <div style={{fontSize:9,color:'var(--text3)',fontWeight:600,textAlign:'center'}}>
-                        {LUNI_NUME[luna.luna]}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
+            <MiniBarChart data={valoareData} valueKey="valoare_factura" color="var(--l2)" colorLight="rgba(124,58,237,0.2)" unit="RON" />
           </div>
         )}
 
-        {/* GRAFIC CONSUM PER PROPRIETAR */}
-        {apartamente.length > 0 && istoricLuni.length > 0 && (
+        {apartamente.length > 0 && (
           <div style={{background:'#fff',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
               <div style={{fontFamily:'Sora,sans-serif',fontSize:13,fontWeight:700}}>Consum per proprietar - 12 luni</div>
-              <div style={{fontSize:10,color:'var(--text3)'}}>← scroll</div>
+              <div style={{fontSize:10,color:'var(--text3)'}}>scroll →</div>
             </div>
-            <div style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
-              <div style={{display:'flex',alignItems:'flex-end',gap:2,height:150,minWidth:istoricLuni.length*50,padding:'8px 4px 0'}}>
-                {istoricLuni.map((luna, li) => {
-                  const citiriLuna = istoricCitiri.filter(c => c.luna_id === luna.id)
-                  const maxCitLuna = Math.max(...istoricCitiri.filter(c => c.luna_id === luna.id).map(c => c.consum || 0), 1)
-                  const maxTotal = Math.max(...istoricCitiri.map(c => c.consum || 0), 1)
-                  const isLast = li === istoricLuni.length - 1
-                  return (
-                    <div key={luna.id} style={{display:'flex',alignItems:'flex-end',gap:1,flex:1,minWidth:44,position:'relative'}}>
-                      {apartamente.map((apt, ai) => {
-                        const citire = citiriLuna.find(c => c.apartament_id === apt.id)
-                        const consum = citire?.consum || 0
-                        const h = Math.max((consum / maxTotal) * 110, consum > 0 ? 3 : 0)
-                        return (
-                          <div key={apt.id} style={{
-                            flex:1,borderRadius:'3px 3px 0 0',
-                            background: isLast ? CULORI[ai%5] : CULORI_LIGHT[ai%5],
-                            height:h,minHeight:consum>0?2:0
-                          }} title={`${apt.proprietar_nume}: ${consum.toFixed(2)} mc`}></div>
-                        )
-                      })}
-                      <div style={{position:'absolute',bottom:-16,left:'50%',transform:'translateX(-50%)',fontSize:8,color:'var(--text3)',fontWeight:600,whiteSpace:'nowrap'}}>
-                        {LUNI_NUME[luna.luna]}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-            <div style={{display:'flex',gap:10,marginTop:20,flexWrap:'wrap'}}>
-              {apartamente.map((apt, i) => (
-                <div key={apt.id} style={{display:'flex',alignItems:'center',gap:5,fontSize:10,color:'var(--text3)'}}>
-                  <div style={{width:10,height:10,borderRadius:2,background:CULORI[i%5]}}></div>
-                  {apt.proprietar_nume.split(' ')[0]}
-                </div>
-              ))}
-            </div>
+            <ProprietarChart luni={istoricLuni} citiri={istoricCitiri} apartamente={apartamente} />
           </div>
         )}
 
