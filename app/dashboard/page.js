@@ -18,18 +18,91 @@ function BarChart({ data, valueKey, color, colorLight, unit, height=140 }) {
       <div style={{display:'flex',alignItems:'flex-end',gap:5,height,minWidth:data.length*38,paddingTop:4}}>
         {data.map((item,i) => {
           const val = item[valueKey] || 0
-          const h = val > 0 ? Math.max(((val-minVal)/range)*(height-32),6) : 0
+          const h = val > 0 ? Math.max(((val-minVal)/range)*(height-36),6) : 0
           const isLast = i === data.length-1
+          const displayVal = unit==='RON' ? Math.round(val) : val
           return (
             <div key={i} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:2,minWidth:32,flex:1}}>
-              <div style={{fontSize:9,fontWeight:700,height:13,color:isLast?color:'transparent'}}>
-                {unit==='RON'?Math.round(val):val}
+              <div style={{fontSize:8,fontWeight:700,height:12,color:color,textAlign:'center',lineHeight:'12px'}}>
+                {val > 0 ? displayVal : ''}
               </div>
               <div style={{width:24,borderRadius:'4px 4px 0 0',background:isLast?color:colorLight,height:h,minHeight:val>0?3:0}}></div>
-              <div style={{fontSize:8,color:'var(--text3)',fontWeight:600}}>{LUNI_NUME[item.luna]}</div>
+              <div style={{fontSize:8,color:isLast?color:'var(--text3)',fontWeight:isLast?700:600}}>{LUNI_NUME[item.luna]}</div>
             </div>
           )
         })}
+      </div>
+    </div>
+  )
+}
+
+function ProprietarChart({ luni, citiriIst, apartamente, height=160 }) {
+  if (!luni.length || !apartamente.length || !citiriIst.length) return (
+    <div style={{textAlign:'center',color:'var(--text3)',padding:20,fontSize:12}}>Nu sunt date</div>
+  )
+  const allConsumuri = citiriIst.map(c => c.consum||0).filter(v=>v>0)
+  const maxVal = Math.max(...allConsumuri, 1)
+
+  // Calculam max si min per proprietar pentru a le afisa
+  const statPerApt = {}
+  apartamente.forEach(apt => {
+    const consumuriApt = citiriIst.filter(c => c.apartament_id === apt.id && (c.consum||0) > 0).map(c => c.consum||0)
+    if (consumuriApt.length > 0) {
+      statPerApt[apt.id] = {
+        max: Math.max(...consumuriApt),
+        min: Math.min(...consumuriApt)
+      }
+    }
+  })
+
+  return (
+    <div>
+      <div style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
+        <div style={{display:'flex',alignItems:'flex-end',gap:4,height,minWidth:luni.length*52,paddingTop:20}}>
+          {luni.map((luna,li) => {
+            const citiriLuna = citiriIst.filter(c => c.luna_id === luna.id)
+            const isLast = li === luni.length-1
+            return (
+              <div key={luna.id} style={{display:'flex',flexDirection:'column',alignItems:'center',flex:1,minWidth:46,height:'100%'}}>
+                <div style={{display:'flex',alignItems:'flex-end',gap:2,flex:1,width:'100%',position:'relative'}}>
+                  {apartamente.map((apt,ai) => {
+                    const cit = citiriLuna.find(c => c.apartament_id === apt.id)
+                    const consum = cit?.consum || 0
+                    const h = Math.max((consum/maxVal)*120, consum>0?4:0)
+                    const stat = statPerApt[apt.id]
+                    const isMax = stat && consum === stat.max
+                    const isMin = stat && consum === stat.min && consum > 0
+                    return (
+                      <div key={apt.id} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'flex-end',height:'100%'}}>
+                        {(isMax || isMin) && consum > 0 && (
+                          <div style={{fontSize:7,fontWeight:700,color:CULORI[ai%5],marginBottom:1,lineHeight:1}}>
+                            {consum.toFixed(1)}
+                          </div>
+                        )}
+                        <div style={{
+                          width:'100%',borderRadius:'3px 3px 0 0',
+                          background: isLast ? CULORI[ai%5] : CULORI_LIGHT[ai%5],
+                          height: h
+                        }}/>
+                      </div>
+                    )
+                  })}
+                </div>
+                <div style={{fontSize:8,color:isLast?'var(--t1)':'var(--text3)',fontWeight:isLast?700:600,marginTop:3,textAlign:'center'}}>
+                  {LUNI_NUME[luna.luna]}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+      <div style={{display:'flex',gap:10,marginTop:10,flexWrap:'wrap'}}>
+        {apartamente.map((apt,i) => (
+          <div key={apt.id} style={{display:'flex',alignItems:'center',gap:5,fontSize:10,color:'var(--text2)',fontWeight:600}}>
+            <div style={{width:10,height:10,borderRadius:2,background:CULORI[i%5]}}></div>
+            {apt.proprietar_nume.split(' ')[0]}
+          </div>
+        ))}
       </div>
     </div>
   )
@@ -55,25 +128,21 @@ export default function Dashboard() {
     if (!user) { router.push('/login'); return }
     const { data: prof } = await supabase.from('profiles').select('*').eq('id', user.id).single()
     setProfile(prof)
-
     const { data: luni } = await supabase.from('luni_facturare').select('*').order('an',{ascending:false}).order('luna',{ascending:false}).limit(12)
     if (luni && luni.length > 0) {
       const luniRev = [...luni].reverse()
       setLunaActuala(luni[0])
       setIstoricLuni(luniRev)
-
       const { data: cit } = await supabase.from('citiri').select('*, apartamente(numar,proprietar_nume)').eq('luna_id', luni[0].id)
       const { data: calc } = await supabase.from('calcule_lunare').select('*, apartamente(numar,proprietar_nume)').eq('luna_id', luni[0].id)
       const { data: pl } = await supabase.from('plati').select('*, apartamente(numar,proprietar_nume)').eq('luna_id', luni[0].id)
       setCitiri(cit || [])
       setCalcule(calc || [])
       setPlati(pl || [])
-
       const lunaIds = luniRev.map(l => l.id)
-      const { data: citIst } = await supabase.from('citiri').select('luna_id, apartament_id, consum, apartamente(id, numar, proprietar_nume)').in('luna_id', lunaIds)
+      const { data: citIst } = await supabase.from('citiri').select('luna_id,apartament_id,consum').in('luna_id', lunaIds)
       setCitiriIst(citIst || [])
-
-      const { data: apt } = await supabase.from('apartamente').select('*').eq('activ', true).order('numar')
+      const { data: apt } = await supabase.from('apartamente').select('*').eq('activ',true).order('numar')
       setApartamente(apt || [])
     }
     setLoading(false)
@@ -96,12 +165,8 @@ export default function Dashboard() {
   const pierdere = lunaActuala ? lunaActuala.consum_facturat - citiri.reduce((s,c) => s+(c.consum||0), 0) : 0
   const nrRestante = plati.filter(p => (p.suma_calculata||0)>(p.suma_platita||0)).length
   const lunaNume = lunaActuala ? `${LUNI_NUME[lunaActuala.luna]} ${lunaActuala.an}` : ''
-
   const consumData = istoricLuni.map(l => ({luna:l.luna, an:l.an, consum_facturat:l.consum_facturat}))
   const valoareData = istoricLuni.map(l => ({luna:l.luna, an:l.an, valoare_factura:l.valoare_factura}))
-
-  const maxCitIst = Math.max(...citiriIst.map(c => c.consum||0), 1)
-  const minCitIst = Math.min(...citiriIst.filter(c=>c.consum>0).map(c=>c.consum), 1) * 0.7
 
   return (
     <div style={{minHeight:'100vh',background:'var(--bg)',fontFamily:'Nunito,sans-serif',paddingBottom:90}}>
@@ -227,43 +292,7 @@ export default function Dashboard() {
               <div style={{fontFamily:'Sora,sans-serif',fontSize:13,fontWeight:700}}>Consum per proprietar - 12 luni</div>
               <div style={{fontSize:10,color:'var(--text3)'}}>scroll →</div>
             </div>
-            <div style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
-              <div style={{display:'flex',alignItems:'flex-end',gap:4,height:160,minWidth:istoricLuni.length*52,paddingTop:8}}>
-                {istoricLuni.map((luna,li) => {
-                  const citiriLuna = citiriIst.filter(c => c.luna_id === luna.id)
-                  const isLast = li === istoricLuni.length-1
-                  return (
-                    <div key={luna.id} style={{display:'flex',flexDirection:'column',alignItems:'center',flex:1,minWidth:46,height:'100%'}}>
-                      <div style={{display:'flex',alignItems:'flex-end',gap:2,flex:1,width:'100%'}}>
-                        {apartamente.map((apt,ai) => {
-                          const cit = citiriLuna.find(c => c.apartament_id === apt.id)
-                          const consum = cit?.consum || 0
-                          const h = Math.max((consum/maxCitIst)*120, consum>0?4:0)
-                          return (
-                            <div key={apt.id} style={{
-                              flex:1, borderRadius:'3px 3px 0 0',
-                              background: isLast ? CULORI[ai%5] : CULORI_LIGHT[ai%5],
-                              height: h
-                            }}/>
-                          )
-                        })}
-                      </div>
-                      <div style={{fontSize:8,color:isLast?'var(--t1)':'var(--text3)',fontWeight:700,marginTop:4,textAlign:'center'}}>
-                        {LUNI_NUME[luna.luna]}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-            <div style={{display:'flex',gap:10,marginTop:10,flexWrap:'wrap'}}>
-              {apartamente.map((apt,i) => (
-                <div key={apt.id} style={{display:'flex',alignItems:'center',gap:5,fontSize:10,color:'var(--text2)',fontWeight:600}}>
-                  <div style={{width:10,height:10,borderRadius:2,background:CULORI[i%5]}}></div>
-                  {apt.proprietar_nume.split(' ')[0]}
-                </div>
-              ))}
-            </div>
+            <ProprietarChart luni={istoricLuni} citiriIst={citiriIst} apartamente={apartamente} />
           </div>
         )}
 
