@@ -3,8 +3,9 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 
+const LUNI_NUME = ['','Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Nov','Dec']
 const CULORI = ['#e07b39','#2563a8','#059669','#7c3aed','#b91c1c']
-const PROPRIETARI = ['Ariton Alex','Avadanei Viorica','Tanasescu Carmen','Vlad Stefan','Pavel Corina']
+const CULORI_LIGHT = ['rgba(224,123,57,0.2)','rgba(37,99,168,0.2)','rgba(5,150,105,0.2)','rgba(124,58,237,0.2)','rgba(185,28,28,0.2)']
 
 export default function Dashboard() {
   const [profile, setProfile] = useState(null)
@@ -13,6 +14,7 @@ export default function Dashboard() {
   const [plati, setPlati] = useState([])
   const [calcule, setCalcule] = useState([])
   const [istoricLuni, setIstoricLuni] = useState([])
+  const [istoricCitiri, setIstoricCitiri] = useState([])
   const [loading, setLoading] = useState(true)
   const router = useRouter()
   const supabase = createClient()
@@ -22,39 +24,21 @@ export default function Dashboard() {
   async function loadData() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { router.push('/login'); return }
-
     const { data: prof } = await supabase.from('profiles').select('*').eq('id', user.id).single()
     setProfile(prof)
-
-    const { data: luni } = await supabase
-      .from('luni_facturare')
-      .select('*')
-      .order('an', { ascending: false })
-      .order('luna', { ascending: false })
-      .limit(12)
-    
+    const { data: luni } = await supabase.from('luni_facturare').select('*').order('an', { ascending: false }).order('luna', { ascending: false }).limit(12)
     if (luni && luni.length > 0) {
       setLunaActuala(luni[0])
       setIstoricLuni([...luni].reverse())
-
-      const { data: cit } = await supabase
-        .from('citiri')
-        .select('*, apartamente(numar, proprietar_nume)')
-        .eq('luna_id', luni[0].id)
-
-      const { data: calc } = await supabase
-        .from('calcule_lunare')
-        .select('*, apartamente(numar, proprietar_nume)')
-        .eq('luna_id', luni[0].id)
-
-      const { data: pl } = await supabase
-        .from('plati')
-        .select('*, apartamente(numar, proprietar_nume)')
-        .eq('luna_id', luni[0].id)
-
+      const { data: cit } = await supabase.from('citiri').select('*, apartamente(numar, proprietar_nume)').eq('luna_id', luni[0].id)
+      const { data: calc } = await supabase.from('calcule_lunare').select('*, apartamente(numar, proprietar_nume)').eq('luna_id', luni[0].id)
+      const { data: pl } = await supabase.from('plati').select('*, apartamente(numar, proprietar_nume)').eq('luna_id', luni[0].id)
       setCitiri(cit || [])
       setCalcule(calc || [])
       setPlati(pl || [])
+      const lunaIds = luni.map(l => l.id)
+      const { data: citIst } = await supabase.from('citiri').select('*, apartamente(numar, proprietar_nume)').in('luna_id', lunaIds)
+      setIstoricCitiri(citIst || [])
     }
     setLoading(false)
   }
@@ -63,8 +47,6 @@ export default function Dashboard() {
     await supabase.auth.signOut()
     router.push('/login')
   }
-
-  const LUNI_NUME = ['','Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Nov','Dec']
 
   if (loading) return (
     <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:'var(--bg)',fontFamily:'Nunito,sans-serif'}}>
@@ -82,10 +64,16 @@ export default function Dashboard() {
   const nrRestante = plati.filter(p => (p.suma_calculata || 0) > (p.suma_platita || 0)).length
   const lunaNume = lunaActuala ? `${LUNI_NUME[lunaActuala.luna]} ${lunaActuala.an}` : ''
 
+  const maxConsum = Math.max(...istoricLuni.map(l => l.consum_facturat), 1)
+  const maxValoare = Math.max(...istoricLuni.map(l => l.valoare_factura), 1)
+
+  const apartamente = [...new Map(istoricCitiri.map(c => [c.apartament_id, c.apartamente])).values()]
+    .filter(Boolean)
+    .sort((a,b) => a.numar - b.numar)
+
   return (
     <div style={{minHeight:'100vh',background:'var(--bg)',fontFamily:'Nunito,sans-serif'}}>
-      
-      {/* HEADER */}
+
       <div style={{background:'linear-gradient(135deg,#7c3aed,#0d9488)',padding:'14px 20px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
         <div style={{display:'flex',alignItems:'center',gap:10}}>
           <span style={{fontSize:22}}>💧</span>
@@ -103,7 +91,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* TAB NAV */}
       <div style={{background:'#fff',borderBottom:'1px solid var(--border)',display:'flex',overflowX:'auto',padding:'0 10px'}}>
         {[
           {label:'Dashboard',icon:'📊',href:'/dashboard'},
@@ -115,16 +102,16 @@ export default function Dashboard() {
         ].map(tab => (
           <a key={tab.href} href={tab.href} style={{
             display:'flex',alignItems:'center',gap:5,padding:'11px 14px',
-            fontSize:12,fontWeight:700,color:tab.href==='/dashboard'?'var(--t1)':'var(--text3)',
+            fontSize:12,fontWeight:700,
+            color:tab.href==='/dashboard'?'var(--t1)':'var(--text3)',
             borderBottom:tab.href==='/dashboard'?'2.5px solid var(--t1)':'2.5px solid transparent',
-            textDecoration:'none',whiteSpace:'nowrap',fontFamily:'Nunito,sans-serif'
+            textDecoration:'none',whiteSpace:'nowrap'
           }}>{tab.icon} {tab.label}</a>
         ))}
       </div>
 
       <div style={{padding:'16px 14px',display:'flex',flexDirection:'column',gap:12,maxWidth:900,margin:'0 auto'}}>
 
-        {/* LUNA CURENTA */}
         {lunaActuala && (
           <div style={{background:'linear-gradient(135deg,var(--t7),var(--l7))',border:'1.5px solid var(--t5)',borderRadius:'var(--r)',padding:'14px 16px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
             <div>
@@ -139,40 +126,36 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* STAT PILLS */}
         <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:10}}>
           <div style={{background:'#fff',borderRadius:'var(--r)',padding:'14px 16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
-            <div style={{fontSize:10,color:'var(--text3)',fontWeight:700,textTransform:'uppercase',letterSpacing:0.5,marginBottom:6}}>Colectat luna asta</div>
+            <div style={{fontSize:10,color:'var(--text3)',fontWeight:700,textTransform:'uppercase',letterSpacing:0.5,marginBottom:6}}>Colectat</div>
             <div style={{fontSize:22,fontWeight:800,color:'var(--t1)',fontFamily:'Sora,sans-serif'}}>{totalColectat.toFixed(0)} <span style={{fontSize:13,color:'var(--text3)',fontWeight:500}}>RON</span></div>
           </div>
           <div style={{background:'#fff',borderRadius:'var(--r)',padding:'14px 16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
-            <div style={{fontSize:10,color:'var(--text3)',fontWeight:700,textTransform:'uppercase',letterSpacing:0.5,marginBottom:6}}>Restante luna asta</div>
+            <div style={{fontSize:10,color:'var(--text3)',fontWeight:700,textTransform:'uppercase',letterSpacing:0.5,marginBottom:6}}>Restante</div>
             <div style={{fontSize:22,fontWeight:800,color:nrRestante>0?'#f97316':'var(--t1)',fontFamily:'Sora,sans-serif'}}>{totalRestant.toFixed(0)} <span style={{fontSize:13,color:'var(--text3)',fontWeight:500}}>RON</span></div>
           </div>
           <div style={{background:'#fff',borderRadius:'var(--r)',padding:'14px 16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
             <div style={{fontSize:10,color:'var(--text3)',fontWeight:700,textTransform:'uppercase',letterSpacing:0.5,marginBottom:6}}>Pierdere apa</div>
-            <div style={{fontSize:22,fontWeight:800,color:'#f97316',fontFamily:'Sora,sans-serif'}}>{pierdere.toFixed(2)} <span style={{fontSize:13,color:'var(--text3)',fontWeight:500}}>mc</span></div>
+            <div style={{fontSize:22,fontWeight:800,color:'#f97316',fontFamily:'Sora,sans-serif'}}>{Math.abs(pierdere).toFixed(2)} <span style={{fontSize:13,color:'var(--text3)',fontWeight:500}}>mc</span></div>
           </div>
           <div style={{background:'#fff',borderRadius:'var(--r)',padding:'14px 16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
-            <div style={{fontSize:10,color:'var(--text3)',fontWeight:700,textTransform:'uppercase',letterSpacing:0.5,marginBottom:6}}>Citiri introduse</div>
+            <div style={{fontSize:10,color:'var(--text3)',fontWeight:700,textTransform:'uppercase',letterSpacing:0.5,marginBottom:6}}>Citiri</div>
             <div style={{fontSize:22,fontWeight:800,color:'var(--l2)',fontFamily:'Sora,sans-serif'}}>{citiri.length} <span style={{fontSize:13,color:'var(--text3)',fontWeight:500}}>din 5</span></div>
           </div>
         </div>
 
-        {/* SITUATIE PLATI */}
         <div style={{background:'#fff',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
-          <div style={{fontFamily:'Sora,sans-serif',fontSize:14,fontWeight:700,marginBottom:12,color:'var(--text)'}}>Situatie plati - {lunaNume}</div>
+          <div style={{fontFamily:'Sora,sans-serif',fontSize:14,fontWeight:700,marginBottom:12}}>Situatie plati - {lunaNume}</div>
           <div style={{display:'flex',flexDirection:'column',gap:8}}>
             {calcule.length === 0 ? (
-              <div style={{textAlign:'center',color:'var(--text3)',padding:'20px 0',fontSize:13}}>
-                Nu exista calcule pentru luna aceasta. Introduceti citirile mai intai.
-              </div>
+              <div style={{textAlign:'center',color:'var(--text3)',padding:'20px 0',fontSize:13}}>Nu exista calcule pentru luna aceasta.</div>
             ) : calcule.sort((a,b) => a.apartamente.numar - b.apartamente.numar).map((calc, i) => {
               const plata = plati.find(p => p.apartament_id === calc.apartament_id)
               const platit = plata?.suma_platita || 0
               const rest = Math.max(0, calc.suma_calculata - platit)
               const status = rest === 0 ? 'platit' : platit > 0 ? 'partial' : 'neplatit'
-              const culori = {platit:{bg:'var(--t7)',border:'var(--t2)',text:'var(--t1)',label:'Platit'},partial:{bg:'var(--l7)',border:'var(--l4)',text:'var(--l2)',label:'Partial'},neplatit:{bg:'#fff7ed',border:'#fed7aa',text:'#f97316',label:'Neplatit'}}
+              const culori = {platit:{border:'var(--t2)',text:'var(--t1)',label:'Platit'},partial:{border:'var(--l4)',text:'var(--l2)',label:'Partial'},neplatit:{border:'#fed7aa',text:'#f97316',label:'Neplatit'}}
               const c = culori[status]
               return (
                 <div key={calc.id} style={{display:'flex',alignItems:'center',gap:10,padding:'10px 12px',background:'var(--bg)',borderRadius:'var(--r-sm)',borderLeft:`3px solid ${c.border}`}}>
@@ -193,66 +176,121 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* GRAFIC CONSUM 12 LUNI */}
+        {/* GRAFIC CONSUM - SCROLLABIL */}
         {istoricLuni.length > 0 && (
           <div style={{background:'#fff',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
-            <div style={{fontFamily:'Sora,sans-serif',fontSize:14,fontWeight:700,marginBottom:14,color:'var(--text)'}}>Consum facturat - ultimele {istoricLuni.length} luni (mc)</div>
-            <div style={{display:'flex',alignItems:'flex-end',gap:4,height:120,padding:'0 4px'}}>
-              {istoricLuni.map((luna, i) => {
-                const maxVal = Math.max(...istoricLuni.map(l => l.consum_facturat))
-                const h = (luna.consum_facturat / maxVal) * 100
-                const isLast = i === istoricLuni.length - 1
-                return (
-                  <div key={luna.id} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:4}}>
-                    <div style={{fontSize:9,color:'var(--t1)',fontWeight:700,opacity:isLast?1:0}}>{luna.consum_facturat}</div>
-                    <div style={{
-                      width:'100%',borderRadius:'4px 4px 0 0',
-                      background:isLast?'linear-gradient(180deg,var(--t2),var(--t1))':'linear-gradient(180deg,var(--l5),var(--l4))',
-                      height:`${h}%`,minHeight:4,transition:'height 0.3s'
-                    }}></div>
-                    <div style={{fontSize:9,color:'var(--text3)',fontWeight:600,textAlign:'center'}}>{LUNI_NUME[luna.luna]}</div>
-                  </div>
-                )
-              })}
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+              <div style={{fontFamily:'Sora,sans-serif',fontSize:13,fontWeight:700}}>Consum facturat - 12 luni (mc)</div>
+              <div style={{fontSize:10,color:'var(--text3)'}}>← scroll</div>
             </div>
-            <div style={{display:'flex',gap:16,marginTop:8,justifyContent:'center'}}>
-              <div style={{display:'flex',alignItems:'center',gap:5,fontSize:11,color:'var(--text3)'}}>
-                <div style={{width:12,height:12,borderRadius:3,background:'var(--t2)'}}></div>Luna curenta
-              </div>
-              <div style={{display:'flex',alignItems:'center',gap:5,fontSize:11,color:'var(--text3)'}}>
-                <div style={{width:12,height:12,borderRadius:3,background:'var(--l4)'}}></div>Luni anterioare
+            <div style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
+              <div style={{display:'flex',alignItems:'flex-end',gap:6,height:130,minWidth:istoricLuni.length*40,padding:'8px 4px 0'}}>
+                {istoricLuni.map((luna, i) => {
+                  const h = Math.max((luna.consum_facturat / maxConsum) * 100, 4)
+                  const isLast = i === istoricLuni.length - 1
+                  return (
+                    <div key={luna.id} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:4,minWidth:34}}>
+                      <div style={{fontSize:9,color:'var(--t1)',fontWeight:700,height:14,display:'flex',alignItems:'flex-end'}}>
+                        {isLast ? luna.consum_facturat : ''}
+                      </div>
+                      <div style={{
+                        width:28,borderRadius:'4px 4px 0 0',
+                        background:isLast?'linear-gradient(180deg,var(--t3),var(--t1))':'rgba(20,184,166,0.3)',
+                        height:`${h}%`,minHeight:4
+                      }}></div>
+                      <div style={{fontSize:9,color:'var(--text3)',fontWeight:600,textAlign:'center'}}>
+                        {LUNI_NUME[luna.luna]}
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
             </div>
           </div>
         )}
 
-        {/* GRAFIC VALOARE FACTURI */}
+        {/* GRAFIC VALOARE - SCROLLABIL */}
         {istoricLuni.length > 0 && (
           <div style={{background:'#fff',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
-            <div style={{fontFamily:'Sora,sans-serif',fontSize:14,fontWeight:700,marginBottom:14,color:'var(--text)'}}>Valoare facturi - ultimele {istoricLuni.length} luni (RON)</div>
-            <div style={{display:'flex',alignItems:'flex-end',gap:4,height:100,padding:'0 4px'}}>
-              {istoricLuni.map((luna, i) => {
-                const maxVal = Math.max(...istoricLuni.map(l => l.valoare_factura))
-                const h = (luna.valoare_factura / maxVal) * 100
-                const isLast = i === istoricLuni.length - 1
-                return (
-                  <div key={luna.id} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:4}}>
-                    <div style={{
-                      width:'100%',borderRadius:'4px 4px 0 0',
-                      background:isLast?'linear-gradient(180deg,var(--l3),var(--l2))':'linear-gradient(180deg,var(--t4),var(--t2))',
-                      height:`${h}%`,minHeight:4
-                    }}></div>
-                    <div style={{fontSize:9,color:'var(--text3)',fontWeight:600}}>{LUNI_NUME[luna.luna]}</div>
-                  </div>
-                )
-              })}
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+              <div style={{fontFamily:'Sora,sans-serif',fontSize:13,fontWeight:700}}>Valoare facturi - 12 luni (RON)</div>
+              <div style={{fontSize:10,color:'var(--text3)'}}>← scroll</div>
+            </div>
+            <div style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
+              <div style={{display:'flex',alignItems:'flex-end',gap:6,height:130,minWidth:istoricLuni.length*40,padding:'8px 4px 0'}}>
+                {istoricLuni.map((luna, i) => {
+                  const h = Math.max((luna.valoare_factura / maxValoare) * 100, 4)
+                  const isLast = i === istoricLuni.length - 1
+                  return (
+                    <div key={luna.id} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:4,minWidth:34}}>
+                      <div style={{fontSize:9,color:'var(--l2)',fontWeight:700,height:14,display:'flex',alignItems:'flex-end'}}>
+                        {isLast ? luna.valoare_factura?.toFixed(0) : ''}
+                      </div>
+                      <div style={{
+                        width:28,borderRadius:'4px 4px 0 0',
+                        background:isLast?'linear-gradient(180deg,var(--l4),var(--l2))':'rgba(139,92,246,0.25)',
+                        height:`${h}%`,minHeight:4
+                      }}></div>
+                      <div style={{fontSize:9,color:'var(--text3)',fontWeight:600,textAlign:'center'}}>
+                        {LUNI_NUME[luna.luna]}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* GRAFIC CONSUM PER PROPRIETAR */}
+        {apartamente.length > 0 && istoricLuni.length > 0 && (
+          <div style={{background:'#fff',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+              <div style={{fontFamily:'Sora,sans-serif',fontSize:13,fontWeight:700}}>Consum per proprietar - 12 luni</div>
+              <div style={{fontSize:10,color:'var(--text3)'}}>← scroll</div>
+            </div>
+            <div style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
+              <div style={{display:'flex',alignItems:'flex-end',gap:2,height:150,minWidth:istoricLuni.length*50,padding:'8px 4px 0'}}>
+                {istoricLuni.map((luna, li) => {
+                  const citiriLuna = istoricCitiri.filter(c => c.luna_id === luna.id)
+                  const maxCitLuna = Math.max(...istoricCitiri.filter(c => c.luna_id === luna.id).map(c => c.consum || 0), 1)
+                  const maxTotal = Math.max(...istoricCitiri.map(c => c.consum || 0), 1)
+                  const isLast = li === istoricLuni.length - 1
+                  return (
+                    <div key={luna.id} style={{display:'flex',alignItems:'flex-end',gap:1,flex:1,minWidth:44,position:'relative'}}>
+                      {apartamente.map((apt, ai) => {
+                        const citire = citiriLuna.find(c => c.apartament_id === apt.id)
+                        const consum = citire?.consum || 0
+                        const h = Math.max((consum / maxTotal) * 110, consum > 0 ? 3 : 0)
+                        return (
+                          <div key={apt.id} style={{
+                            flex:1,borderRadius:'3px 3px 0 0',
+                            background: isLast ? CULORI[ai%5] : CULORI_LIGHT[ai%5],
+                            height:h,minHeight:consum>0?2:0
+                          }} title={`${apt.proprietar_nume}: ${consum.toFixed(2)} mc`}></div>
+                        )
+                      })}
+                      <div style={{position:'absolute',bottom:-16,left:'50%',transform:'translateX(-50%)',fontSize:8,color:'var(--text3)',fontWeight:600,whiteSpace:'nowrap'}}>
+                        {LUNI_NUME[luna.luna]}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+            <div style={{display:'flex',gap:10,marginTop:20,flexWrap:'wrap'}}>
+              {apartamente.map((apt, i) => (
+                <div key={apt.id} style={{display:'flex',alignItems:'center',gap:5,fontSize:10,color:'var(--text3)'}}>
+                  <div style={{width:10,height:10,borderRadius:2,background:CULORI[i%5]}}></div>
+                  {apt.proprietar_nume.split(' ')[0]}
+                </div>
+              ))}
             </div>
           </div>
         )}
 
       </div>
 
-      {/* BOTTOM NAV */}
       <div style={{position:'fixed',bottom:0,left:0,right:0,background:'#fff',borderTop:'1px solid var(--border)',display:'flex',justifyContent:'space-around',padding:'8px 0 20px',zIndex:100,boxShadow:'0 -4px 20px rgba(0,0,0,0.06)'}}>
         {[
           {icon:'📊',label:'Dashboard',href:'/dashboard'},
