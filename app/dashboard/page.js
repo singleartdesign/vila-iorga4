@@ -271,7 +271,7 @@ export default function Dashboard() {
                   </div>
                   <div style={{textAlign:'right'}}>
                     <div style={{fontSize:10,color:'var(--text3)',marginBottom:2}}>
-                      {(calc.consum_individual * lunaActuala?.pret_per_mc).toFixed(0)} + <span style={{color:'#f97316'}}>{(calc.pierdere_repartizata * lunaActuala?.pret_per_mc).toFixed(0)}</span> RON
+                      {(calc.consum_individual * lunaActuala?.pret_per_mc).toFixed(2)} + <span style={{color:'#f97316'}}>{(calc.pierdere_repartizata * lunaActuala?.pret_per_mc).toFixed(2)}</span> RON
                     </div>
                     <div style={{fontSize:14,fontWeight:800,color:c.text,fontFamily:'Sora,sans-serif'}}>{calc.suma_calculata?.toFixed(2)} RON</div>
                     <div style={{fontSize:10,fontWeight:700,color:c.text}}>{c.label}</div>
