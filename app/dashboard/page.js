@@ -270,6 +270,9 @@ export default function Dashboard() {
                     <div style={{fontSize:11,color:'var(--text3)'}}>Ap. {calc.apartamente.numar} · {calc.mc_de_plata?.toFixed(2)} mc</div>
                   </div>
                   <div style={{textAlign:'right'}}>
+                    <div style={{fontSize:10,color:'var(--text3)',marginBottom:2}}>
+                      {calc.consum_individual?.toFixed(2)}mc + <span style={{color:'#f97316'}}>{calc.pierdere_repartizata?.toFixed(2)}mc</span>
+                    </div>
                     <div style={{fontSize:14,fontWeight:800,color:c.text,fontFamily:'Sora,sans-serif'}}>{calc.suma_calculata?.toFixed(2)} RON</div>
                     <div style={{fontSize:10,fontWeight:700,color:c.text}}>{c.label}</div>
                   </div>
