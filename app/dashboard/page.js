@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 
@@ -8,13 +8,22 @@ const CULORI = ['#e07b39','#2563a8','#059669','#7c3aed','#b91c1c']
 const CULORI_LIGHT = ['rgba(224,123,57,0.2)','rgba(37,99,168,0.2)','rgba(5,150,105,0.2)','rgba(124,58,237,0.2)','rgba(185,28,28,0.2)']
 
 function BarChart({ data, valueKey, color, colorLight, unit, height=140 }) {
+  const scrollRef = useRef(null)
+  
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollLeft = scrollRef.current.scrollWidth
+    }
+  }, [data])
+
   const vals = data.map(d => d[valueKey] || 0).filter(v => v > 0)
   if (!vals.length) return <div style={{textAlign:'center',color:'var(--text3)',padding:20,fontSize:12}}>Nu sunt date</div>
   const maxVal = Math.max(...vals)
   const minVal = Math.min(...vals) * 0.7
   const range = maxVal - minVal || 1
+  
   return (
-    <div style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
+    <div ref={scrollRef} style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
       <div style={{display:'flex',alignItems:'flex-end',gap:5,height,minWidth:data.length*38,paddingTop:4}}>
         {data.map((item,i) => {
           const val = item[valueKey] || 0
@@ -37,27 +46,31 @@ function BarChart({ data, valueKey, color, colorLight, unit, height=140 }) {
 }
 
 function ProprietarChart({ luni, citiriIst, apartamente, height=160 }) {
+  const scrollRef = useRef(null)
+  
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollLeft = scrollRef.current.scrollWidth
+    }
+  }, [luni])
+
   if (!luni.length || !apartamente.length || !citiriIst.length) return (
     <div style={{textAlign:'center',color:'var(--text3)',padding:20,fontSize:12}}>Nu sunt date</div>
   )
   const allConsumuri = citiriIst.map(c => c.consum||0).filter(v=>v>0)
   const maxVal = Math.max(...allConsumuri, 1)
 
-  // Calculam max si min per proprietar pentru a le afisa
   const statPerApt = {}
   apartamente.forEach(apt => {
     const consumuriApt = citiriIst.filter(c => c.apartament_id === apt.id && (c.consum||0) > 0).map(c => c.consum||0)
     if (consumuriApt.length > 0) {
-      statPerApt[apt.id] = {
-        max: Math.max(...consumuriApt),
-        min: Math.min(...consumuriApt)
-      }
+      statPerApt[apt.id] = { max: Math.max(...consumuriApt), min: Math.min(...consumuriApt) }
     }
   })
 
   return (
     <div>
-      <div style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
+      <div ref={scrollRef} style={{overflowX:'auto',WebkitOverflowScrolling:'touch'}}>
         <div style={{display:'flex',alignItems:'flex-end',gap:4,height,minWidth:luni.length*52,paddingTop:20}}>
           {luni.map((luna,li) => {
             const citiriLuna = citiriIst.filter(c => c.luna_id === luna.id)
@@ -270,7 +283,7 @@ export default function Dashboard() {
           <div style={{background:'#fff',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
               <div style={{fontFamily:'Sora,sans-serif',fontSize:13,fontWeight:700}}>Consum facturat - 12 luni (mc)</div>
-              <div style={{fontSize:10,color:'var(--text3)'}}>scroll →</div>
+              <div style={{fontSize:10,color:'var(--text3)'}}>← scroll</div>
             </div>
             <BarChart data={consumData} valueKey="consum_facturat" color="var(--t1)" colorLight="rgba(20,184,166,0.25)" unit="mc" />
           </div>
@@ -280,7 +293,7 @@ export default function Dashboard() {
           <div style={{background:'#fff',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
               <div style={{fontFamily:'Sora,sans-serif',fontSize:13,fontWeight:700}}>Valoare facturi - 12 luni (RON)</div>
-              <div style={{fontSize:10,color:'var(--text3)'}}>scroll →</div>
+              <div style={{fontSize:10,color:'var(--text3)'}}>← scroll</div>
             </div>
             <BarChart data={valoareData} valueKey="valoare_factura" color="var(--l2)" colorLight="rgba(124,58,237,0.2)" unit="RON" />
           </div>
@@ -290,7 +303,7 @@ export default function Dashboard() {
           <div style={{background:'#fff',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
               <div style={{fontFamily:'Sora,sans-serif',fontSize:13,fontWeight:700}}>Consum per proprietar - 12 luni</div>
-              <div style={{fontSize:10,color:'var(--text3)'}}>scroll →</div>
+              <div style={{fontSize:10,color:'var(--text3)'}}>← scroll</div>
             </div>
             <ProprietarChart luni={istoricLuni} citiriIst={citiriIst} apartamente={apartamente} />
           </div>
