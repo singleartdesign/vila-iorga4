@@ -38,6 +38,8 @@ export default function Plati() {
   }
 
   function getPlata(aptId) { return plati.find(p => p.apartament_id === aptId) }
+  function soldAnterior(aptId) { return Number(getPlata(aptId)?.sold_anterior) || 0 }
+  function totalDePlata(calc) { return Math.round(((Number(calc.suma_calculata) || 0) + soldAnterior(calc.apartament_id)) * 100) / 100 }
   function canEdit() { return profile?.rol === 'administrator' || profile?.rol === 'manager' }
 
   function openModal(calc) {
@@ -54,8 +56,9 @@ export default function Plati() {
     setSaving(true)
     const { data: { user } } = await supabase.auth.getUser()
     const plataExistenta = getPlata(modal.apartament_id)
-    const rest = Math.max(0, modal.suma_calculata - s)
-    const status = s <= 0 ? 'neplatit' : s >= modal.suma_calculata ? 'integral' : 'partial'
+    const datorat = totalDePlata(modal)
+    const rest = Math.max(0, Math.round((datorat - s) * 100) / 100)
+    const status = s <= 0 && datorat > 0 ? 'neplatit' : s >= datorat ? 'integral' : 'partial'
     let error
     if (plataExistenta) {
       const { error: e } = await supabase.from('plati').update({
@@ -130,9 +133,11 @@ export default function Plati() {
             ) : calcule.sort((a,b) => a.apartamente.numar-b.apartamente.numar).map((calc,i) => {
               const plata = getPlata(calc.apartament_id)
               const platit = plata?.suma_platita || 0
-              const rest = Math.max(0, calc.suma_calculata - platit)
+              const datorat = totalDePlata(calc)
+              const sold = soldAnterior(calc.apartament_id)
+              const rest = Math.max(0, Math.round((datorat - platit) * 100) / 100)
               const status = rest === 0 ? 'platit' : platit > 0 ? 'partial' : 'neplatit'
-              const pct = calc.suma_calculata > 0 ? Math.min(100,(platit/calc.suma_calculata)*100) : 0
+              const pct = datorat > 0 ? Math.min(100,(platit/datorat)*100) : 100
               const cs = {
                 platit:{text:'var(--t1)',border:'var(--t2)',bg:'var(--t6)',label:'Platit integral'},
                 partial:{text:'var(--l2)',border:'var(--l4)',bg:'var(--l6)',label:'Platit partial'},
@@ -156,7 +161,8 @@ export default function Plati() {
                       <div style={{fontSize:11,color:'var(--text3)'}}>Ap. {calc.apartamente.numar}</div>
                     </div>
                     <div style={{textAlign:'right'}}>
-                      <div style={{fontSize:16,fontWeight:800,color:cs.text,fontFamily:'Sora,sans-serif'}}>{calc.suma_calculata?.toFixed(2)} RON</div>
+                      <div style={{fontSize:16,fontWeight:800,color:cs.text,fontFamily:'Sora,sans-serif'}}>{datorat.toFixed(2)} RON</div>
+                      {sold !== 0 && <div style={{fontSize:10,color:'var(--text3)'}}>luna {Number(calc.suma_calculata).toFixed(2)} {sold < 0 ? `− avans ${(-sold).toFixed(2)}` : `+ restanta ${sold.toFixed(2)}`}</div>}
                       <div style={{fontSize:10,fontWeight:700,color:cs.text}}>{cs.label}</div>
                     </div>
                   </div>
@@ -226,7 +232,7 @@ export default function Plati() {
               </div>
               <div style={{padding:'10px',background:'var(--l7)',borderRadius:10,textAlign:'center',border:'1px solid var(--l5)'}}>
                 <div style={{fontSize:9,color:'var(--text3)',marginBottom:2}}>Total</div>
-                <div style={{fontSize:12,fontWeight:800,color:'var(--l2)'}}>{modal.suma_calculata?.toFixed(2)}</div>
+                <div style={{fontSize:12,fontWeight:800,color:'var(--l2)'}}>{totalDePlata(modal).toFixed(2)}</div>
                 <div style={{fontSize:9,color:'var(--text3)'}}>RON</div>
               </div>
             </div>
@@ -238,11 +244,11 @@ export default function Plati() {
                 placeholder="0.00"
               />
             </div>
-            <button onClick={() => setSuma(modal.suma_calculata?.toFixed(2))} style={{
+            <button onClick={() => setSuma(totalDePlata(modal).toFixed(2))} style={{
               width:'100%',padding:'9px',background:'var(--t6)',border:'1.5px solid var(--t4)',
               borderRadius:8,fontSize:12,fontWeight:700,color:'var(--t1)',cursor:'pointer',marginBottom:12
             }}>
-              Plateste integral: {modal.suma_calculata?.toFixed(2)} RON
+              Plateste integral: {totalDePlata(modal).toFixed(2)} RON
             </button>
 
             {msg && <div style={{padding:'10px',background:'#fee2e2',borderRadius:10,color:'#b91c1c',fontSize:13,marginBottom:12}}>{msg}</div>}

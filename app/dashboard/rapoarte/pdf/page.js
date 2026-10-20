@@ -30,19 +30,22 @@ function RaportPdf() {
     const luna = toate.find(l => String(l.id) === String(lunaId)) || toate[toate.length - 1]
     const idx = toate.findIndex(l => l.id === luna.id)
     const ultimele = toate.slice(Math.max(0, idx - 11), idx + 1)
-    const [{ data: calc }, { data: cit }, { data: ist }] = await Promise.all([
+    const [{ data: calc }, { data: cit }, { data: ist }, { data: pl }] = await Promise.all([
       supabase.from('calcule_lunare').select('*, apartamente(numar, proprietar_nume)').eq('luna_id', luna.id),
       supabase.from('citiri').select('*').eq('luna_id', luna.id),
       supabase.from('calcule_lunare').select('luna_id, consum_individual, apartamente(numar)').in('luna_id', ultimele.map(l => l.id)),
+      supabase.from('plati').select('apartament_id, sold_anterior, note').eq('luna_id', luna.id),
     ])
     const randuri = (calc || []).map(c => {
       const ci = (cit || []).find(x => x.apartament_id === c.apartament_id) || {}
+      const p = (pl || []).find(x => x.apartament_id === c.apartament_id) || {}
       return {
         numar: c.apartamente?.numar, nume: c.apartamente?.proprietar_nume,
         iv: ci.index_vechi, inn: ci.index_nou,
         consum: Number(c.consum_individual) || 0,
         mc: Number(c.mc_de_plata) || 0,
         suma: Number(c.suma_calculata) || 0,
+        sold: Number(p.sold_anterior) || 0,
       }
     }).sort((a, b) => a.numar - b.numar)
     setDate({ luna, randuri, ultimele, ist: ist || [] })
@@ -56,6 +59,8 @@ function RaportPdf() {
   const mc = Number(luna.consum_facturat) || 0
   const sumaAp = randuri.reduce((s, r) => s + r.consum, 0)
   const totalSuma = randuri.reduce((s, r) => s + r.suma, 0)
+  const areSold = randuri.some(r => Math.abs(r.sold) > 0.004)
+  const totalFinal = randuri.reduce((s, r) => s + r.suma + r.sold, 0)
   const dif = mc - sumaAp
   const numeLuna = `${LUNI[luna.luna - 1]} ${luna.an}`
   const dataF = luna.data_factura ? luna.data_factura.split('-').reverse().join('.') : null
@@ -69,7 +74,7 @@ function RaportPdf() {
         .pagina { width: 210mm; min-height: 297mm; margin: 16px auto; background: #fff; font-family: 'Nunito', sans-serif; color: ${INK}; box-shadow: 0 4px 24px rgba(0,0,0,.12); position: relative; }
         .bara { position: sticky; top: 0; z-index: 5; display: flex; gap: 8px; justify-content: center; padding: 10px; background: #1f2a33; }
         .bara button, .bara a { padding: 8px 16px; border-radius: 8px; border: 0; font-weight: 800; font-size: 13px; cursor: pointer; text-decoration: none; font-family: inherit; }
-        table { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; }
         th { text-align: right; color: ${GREY}; font-size: 10px; font-weight: 800; padding: 6px 4px; background: #f4f6f8; }
         td { text-align: right; padding: 8px 4px; border-bottom: .5px solid ${LINE}; }
         th:nth-child(-n+2), td:nth-child(-n+2) { text-align: left; }
@@ -112,7 +117,8 @@ function RaportPdf() {
         <div style={{ fontFamily: 'Sora,sans-serif', fontWeight: 700, fontSize: 14, margin: '20px 0 8px' }}>De plată pe apartament</div>
         <table>
           <thead><tr>
-            <th>Ap.</th><th>Proprietar</th><th>Index vechi</th><th>Index nou</th><th>Consum</th><th>Ajustare*</th><th>mc de plată</th><th>De plată</th>
+            <th>Ap.</th><th>Proprietar</th><th>Index vechi</th><th>Index nou</th><th>Consum</th><th>Ajustare*</th><th>mc de plată</th><th>{areSold ? 'Luna aceasta' : 'De plată'}</th>
+            {areSold && <><th>Avans (−) / Restanță (+)</th><th>Total de plată</th></>}
           </tr></thead>
           <tbody>
             {randuri.map(r => {
@@ -124,14 +130,19 @@ function RaportPdf() {
                   <td>{fmt(r.iv)}</td><td>{fmt(r.inn)}</td><td>{fmt(r.consum)}</td>
                   <td>{(adj >= 0 ? '+' : '−') + fmt(Math.abs(adj))}</td>
                   <td>{fmt(r.mc)}</td>
-                  <td style={{ fontWeight: 800, color: T1, fontSize: 12.5 }}>{fmt(r.suma)} lei</td>
+                  <td style={areSold ? {} : { fontWeight: 800, color: T1, fontSize: 12.5 }}>{fmt(r.suma)}{areSold ? '' : ' lei'}</td>
+                  {areSold && <>
+                    <td>{Math.abs(r.sold) > 0.004 ? (r.sold > 0 ? '+' : '−') + fmt(Math.abs(r.sold)) : '-'}</td>
+                    <td style={{ fontWeight: 800, color: T1, fontSize: 12.5 }}>{fmt(Math.max(0, r.suma + r.sold))} lei</td>
+                  </>}
                 </tr>
               )
             })}
             <tr>
               <td></td><td style={{ fontWeight: 800 }}>Total</td><td></td><td></td>
               <td>{fmt(sumaAp)}</td><td></td><td>{fmt(randuri.reduce((s, r) => s + r.mc, 0))}</td>
-              <td style={{ fontWeight: 800, fontSize: 12.5 }}>{fmt(totalSuma)} lei</td>
+              <td style={{ fontWeight: 800, fontSize: areSold ? 11.5 : 12.5 }}>{fmt(totalSuma)} lei</td>
+              {areSold && <><td></td><td style={{ fontWeight: 800, fontSize: 12.5 }}>{fmt(totalFinal)} lei</td></>}
             </tr>
           </tbody>
         </table>
@@ -163,7 +174,9 @@ function RaportPdf() {
 
         <div style={{ marginTop: 16, fontSize: 11.5, lineHeight: 1.6 }}>
           <strong>Plata</strong><br />
-          În cutia de facturi sau prin transfer la administrator. Vă rog să trimiteți pe grup o confirmare după plată.<br />
+          Prin transfer către Ștefan Vlad (RON), cu mențiunea „Apă {LUNI[luna.luna - 1]} Ap. X”:<br />
+          ING: <strong>RO92 INGB 0000 9999 0052 0242</strong> &nbsp;·&nbsp; Revolut: <strong>RO45 REVO 0000 1364 3298 8060</strong><br />
+          Vă rog să trimiteți pe grup o confirmare după plată.<br />
           Citirile pentru luna următoare: pe 24, cu poză clară la apometru (cifrele negre și roșii), chiar dacă nu ați consumat.
         </div>
       </div>

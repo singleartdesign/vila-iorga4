@@ -174,9 +174,9 @@ export default function Dashboard() {
 
   const totalFactura = lunaActuala?.valoare_factura || 0
   const totalColectat = plati.reduce((s,p) => s+(p.suma_platita||0), 0)
-  const totalRestant = plati.reduce((s,p) => s+Math.max(0,(p.suma_calculata||0)-(p.suma_platita||0)), 0)
+  const totalRestant = plati.reduce((s,p) => s+Math.max(0,(Number(p.suma_calculata)||0)+(Number(p.sold_anterior)||0)-(Number(p.suma_platita)||0)), 0)
   const pierdere = lunaActuala ? lunaActuala.consum_facturat - citiri.reduce((s,c) => s+(c.consum||0), 0) : 0
-  const nrRestante = plati.filter(p => (p.suma_calculata||0)>(p.suma_platita||0)).length
+  const nrRestante = plati.filter(p => (Number(p.suma_calculata)||0)+(Number(p.sold_anterior)||0)>(Number(p.suma_platita)||0)+0.005).length
   const lunaNume = lunaActuala ? `${LUNI_NUME[lunaActuala.luna]} ${lunaActuala.an}` : ''
   const consumData = istoricLuni.map(l => ({luna:l.luna, an:l.an, consum_facturat:l.consum_facturat}))
   const valoareData = istoricLuni.map(l => ({luna:l.luna, an:l.an, valoare_factura:l.valoare_factura}))
@@ -257,7 +257,7 @@ export default function Dashboard() {
             ) : calcule.sort((a,b) => a.apartamente.numar-b.apartamente.numar).map((calc,i) => {
               const plata = plati.find(p => p.apartament_id===calc.apartament_id)
               const platit = plata?.suma_platita||0
-              const rest = Math.max(0, calc.suma_calculata-platit)
+              const rest = Math.max(0, Math.round(((Number(calc.suma_calculata)||0)+(Number(plata?.sold_anterior)||0)-platit)*100)/100)
               const status = rest===0?'platit':platit>0?'partial':'neplatit'
               const c = {platit:{border:'var(--t2)',text:'var(--t1)',label:'Platit'},partial:{border:'var(--l4)',text:'var(--l2)',label:'Partial'},neplatit:{border:'#fed7aa',text:'#f97316',label:'Neplatit'}}[status]
               return (

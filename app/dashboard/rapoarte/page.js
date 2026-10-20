@@ -44,6 +44,7 @@ export default function Rapoarte() {
       return {
         ...c,
         suma_platita: plata?.suma_platita || 0,
+        sold_anterior: Number(plata?.sold_anterior) || 0,
         status: plata?.status || 'neplatit',
         index_vechi: citire?.index_vechi,
         index_nou: citire?.index_nou,
@@ -58,7 +59,7 @@ export default function Rapoarte() {
     await loadSituatie(luna.id)
   }
 
-  const totalCalc = situatie.reduce((s,c) => s + (c.suma_calculata || 0), 0)
+  const totalCalc = situatie.reduce((s,c) => s + (c.suma_calculata || 0) + (c.sold_anterior || 0), 0)
   const totalPlatit = situatie.reduce((s,c) => s + (c.suma_platita || 0), 0)
   const totalRest = Math.max(0, totalCalc - totalPlatit)
   const lunaNume = lunaSelectata ? `${LUNI_NUME[lunaSelectata.luna]} ${lunaSelectata.an}` : ''
@@ -177,7 +178,7 @@ export default function Rapoarte() {
             {situatie.length === 0 ? (
               <div style={{textAlign:'center',color:'var(--text3)',padding:'20px 0',fontSize:13}}>Nu exista date pentru luna selectata.</div>
             ) : situatie.map((item, i) => {
-              const rest = Math.max(0, item.suma_calculata - item.suma_platita)
+              const rest = Math.max(0, Math.round((item.suma_calculata + item.sold_anterior - item.suma_platita) * 100) / 100)
               const status = rest === 0 ? 'platit' : item.suma_platita > 0 ? 'partial' : 'neplatit'
               const statusColor = {platit:'var(--t1)', partial:'var(--l2)', neplatit:'#f97316'}
               const statusLabel = {platit:'Platit', partial:'Partial', neplatit:'Neplatit'}
