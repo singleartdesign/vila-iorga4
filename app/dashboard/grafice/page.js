@@ -20,8 +20,8 @@ export default function Grafice() {
     if (!user) { router.push('/login'); return }
     const { data: prof } = await supabase.from('profiles').select('*').eq('id', user.id).single()
     setProfile(prof)
-    const { data: l } = await supabase.from('luni_facturare').select('*').order('an').order('luna').limit(36)
-    setLuni(l || [])
+    const { data: l } = await supabase.from('luni_facturare').select('*').order('an', { ascending: false }).order('luna', { ascending: false }).limit(36)
+    setLuni((l || []).reverse())
     setLoading(false)
   }
 

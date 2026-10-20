@@ -2,14 +2,32 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
+import { verificaLuna, AlerteLuna, driveUrl, fmt } from '@/lib/verificari'
 
 const LUNI_NUME = ['','Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Nov','Dec']
+
+const str = v => (v === null || v === undefined) ? '' : v.toString()
+function formDin(l) {
+  return {
+    valoare_factura: str(l.valoare_factura), consum_facturat: str(l.consum_facturat),
+    mod_repartizare: l.mod_repartizare || 'proportional', note: l.note || '',
+    nr_factura: l.nr_factura || '', data_factura: l.data_factura || '',
+    index_general_vechi: str(l.index_general_vechi), index_general_nou: str(l.index_general_nou),
+    valoare_estimata: !!l.valoare_estimata,
+    dif_corina_mc: str(l.dif_corina_mc), dif_corina_ron: str(l.dif_corina_ron), nota_corina: l.nota_corina || '',
+    drive_folder_id: l.drive_folder_id || ''
+  }
+}
+const numOrNull = v => (v === '' || v === null || isNaN(parseFloat(v))) ? null : parseFloat(v)
+const inputStil = {width:'100%',padding:'11px',border:'1.5px solid var(--border)',borderRadius:10,fontSize:14,fontFamily:'Nunito,sans-serif',outline:'none',fontWeight:600}
+const labelStil = {display:'block',fontSize:12,fontWeight:600,color:'var(--text2)',marginBottom:5}
 
 export default function Facturi() {
   const [profile, setProfile] = useState(null)
   const [luni, setLuni] = useState([])
   const [lunaActuala, setLunaActuala] = useState(null)
-  const [form, setForm] = useState({ valoare_factura: '', consum_facturat: '', mod_repartizare: 'egal', note: '' })
+  const [form, setForm] = useState(formDin({}))
+  const [citiri, setCitiri] = useState([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState('')
@@ -25,18 +43,20 @@ export default function Facturi() {
     const { data: prof } = await supabase.from('profiles').select('*').eq('id', user.id).single()
     setProfile(prof)
     if (prof?.rol !== 'administrator' && prof?.rol !== 'manager') { router.push('/dashboard'); return }
-    const { data: l } = await supabase.from('luni_facturare').select('*').order('an', { ascending: false }).order('luna', { ascending: false }).limit(24)
+    const { data: l } = await supabase.from('luni_facturare').select('*').order('an', { ascending: false }).order('luna', { ascending: false }).limit(60)
     setLuni(l || [])
     if (l && l.length > 0) {
-      setLunaActuala(l[0])
-      setForm({
-        valoare_factura: l[0].valoare_factura?.toString() || '',
-        consum_facturat: l[0].consum_facturat?.toString() || '',
-        mod_repartizare: l[0].mod_repartizare || 'egal',
-        note: l[0].note || ''
-      })
+      const curenta = (lunaActuala && l.find(x => x.id === lunaActuala.id)) || l[0]
+      await selecteaza(curenta)
     }
     setLoading(false)
+  }
+
+  async function selecteaza(luna) {
+    setLunaActuala(luna)
+    setForm(formDin(luna))
+    const { data: c } = await supabase.from('citiri').select('*, apartamente(numar)').eq('luna_id', luna.id)
+    setCitiri(c || [])
   }
 
   async function salveazaFactura() {
@@ -51,6 +71,15 @@ export default function Facturi() {
       consum_facturat: mc,
       mod_repartizare: form.mod_repartizare,
       note: form.note,
+      nr_factura: form.nr_factura || null,
+      data_factura: form.data_factura || null,
+      index_general_vechi: numOrNull(form.index_general_vechi),
+      index_general_nou: numOrNull(form.index_general_nou),
+      valoare_estimata: form.valoare_estimata,
+      dif_corina_mc: numOrNull(form.dif_corina_mc),
+      dif_corina_ron: numOrNull(form.dif_corina_ron),
+      nota_corina: form.nota_corina || null,
+      drive_folder_id: form.drive_folder_id.trim() || null,
       actualizat_la: new Date().toISOString()
     }).eq('id', lunaActuala.id)
     if (error) { setMsg('Eroare: ' + error.message); setMsgType('error') }
@@ -69,7 +98,7 @@ export default function Facturi() {
       if (luna > 12) { luna = 1; an++ }
     }
     const { data, error } = await supabase.from('luni_facturare').insert({
-      an, luna, valoare_factura: 0, consum_facturat: 0, mod_repartizare: 'egal'
+      an, luna, valoare_factura: 0, consum_facturat: 0, mod_repartizare: 'proportional'
     }).select().single()
     if (error) { setMsg('Eroare: ' + error.message); setMsgType('error') }
     else { await loadData(); setMsg(`Luna ${LUNI_NUME[luna]} ${an} adaugata!`); setMsgType('success') }
@@ -143,6 +172,60 @@ export default function Facturi() {
               </div>
             )}
 
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:12}}>
+              <div>
+                <label style={labelStil}>Nr. factura</label>
+                <input value={form.nr_factura} onChange={e => setForm({...form, nr_factura: e.target.value})} style={inputStil} placeholder="ex: 1234567" />
+              </div>
+              <div>
+                <label style={labelStil}>Data facturii</label>
+                <input type="date" value={form.data_factura} onChange={e => setForm({...form, data_factura: e.target.value})} style={inputStil} />
+              </div>
+              <div>
+                <label style={labelStil}>Contor general: index vechi</label>
+                <input type="number" step="1" value={form.index_general_vechi} onChange={e => setForm({...form, index_general_vechi: e.target.value})} style={inputStil} />
+              </div>
+              <div>
+                <label style={labelStil}>Contor general: index nou</label>
+                <input type="number" step="1" value={form.index_general_nou} onChange={e => setForm({...form, index_general_nou: e.target.value})} style={inputStil} />
+              </div>
+            </div>
+
+            <label style={{display:'flex',alignItems:'center',gap:8,fontSize:13,fontWeight:600,color:'var(--text2)',marginBottom:12,cursor:'pointer'}}>
+              <input type="checkbox" checked={form.valoare_estimata} onChange={e => setForm({...form, valoare_estimata: e.target.checked})} />
+              Factura pe consum estimat (nu pe citire reala)
+            </label>
+
+            <div style={{marginBottom:12}}>
+              <AlerteLuna probleme={verificaLuna({...lunaActuala, ...form, consum_facturat: numOrNull(form.consum_facturat), valoare_factura: numOrNull(form.valoare_factura), index_general_vechi: numOrNull(form.index_general_vechi), index_general_nou: numOrNull(form.index_general_nou)}, citiri)} />
+              <div style={{fontSize:11,color:'var(--text3)',marginTop:6}}>
+                Suma apometrelor: <strong>{fmt(citiri.reduce((s,c) => s + (Number(c.consum)||0), 0))} mc</strong> din {citiri.length} citiri
+              </div>
+            </div>
+
+            <div style={{marginBottom:12}}>
+              <label style={labelStil}>Folder Drive cu poze si aviz (ID sau link)</label>
+              <div style={{display:'flex',gap:8}}>
+                <input value={form.drive_folder_id} onChange={e => { const v = e.target.value; const m = v.match(/folders\/([\w-]+)/); setForm({...form, drive_folder_id: m ? m[1] : v}) }} style={{...inputStil,flex:1,fontSize:12}} placeholder="lipeste linkul folderului din Drive" />
+                {form.drive_folder_id && <a href={driveUrl(form.drive_folder_id)} target="_blank" rel="noreferrer" style={{padding:'10px 12px',borderRadius:10,background:'var(--l7)',color:'var(--l1)',fontSize:12,fontWeight:700,textDecoration:'none',whiteSpace:'nowrap'}}>📁 Deschide</a>}
+              </div>
+            </div>
+
+            <details style={{marginBottom:12,padding:'10px 12px',background:'var(--bg)',borderRadius:10}}>
+              <summary style={{fontSize:12,fontWeight:700,color:'var(--text2)',cursor:'pointer'}}>Diferente fata de calculul vechi (Corina)</summary>
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginTop:10}}>
+                <div>
+                  <label style={labelStil}>Diferenta mc</label>
+                  <input type="number" step="0.01" value={form.dif_corina_mc} onChange={e => setForm({...form, dif_corina_mc: e.target.value})} style={inputStil} />
+                </div>
+                <div>
+                  <label style={labelStil}>Diferenta RON</label>
+                  <input type="number" step="0.01" value={form.dif_corina_ron} onChange={e => setForm({...form, dif_corina_ron: e.target.value})} style={inputStil} />
+                </div>
+              </div>
+              <textarea value={form.nota_corina} onChange={e => setForm({...form, nota_corina: e.target.value})} style={{...inputStil,marginTop:10,minHeight:50,fontSize:12,fontWeight:500,resize:'vertical'}} placeholder="Ce a calculat diferit" />
+            </details>
+
             <div style={{marginBottom:12}}>
               <label style={{display:'block',fontSize:12,fontWeight:600,color:'var(--text2)',marginBottom:8}}>Mod repartizare pierdere</label>
               <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
@@ -187,7 +270,7 @@ export default function Facturi() {
           <div style={{fontFamily:'Sora,sans-serif',fontSize:14,fontWeight:700,marginBottom:12}}>Istoric facturi</div>
           <div style={{display:'flex',flexDirection:'column',gap:6}}>
             {luni.map(luna => (
-              <div key={luna.id} onClick={() => { setLunaActuala(luna); setForm({ valoare_factura: luna.valoare_factura?.toString() || '', consum_facturat: luna.consum_facturat?.toString() || '', mod_repartizare: luna.mod_repartizare || 'egal', note: luna.note || '' }); window.scrollTo(0,0) }}
+              <div key={luna.id} onClick={() => { selecteaza(luna); window.scrollTo(0,0) }}
                 style={{
                   display:'flex', alignItems:'center', gap:10, padding:'10px 12px',
                   background: lunaActuala?.id === luna.id ? 'var(--t7)' : 'var(--bg)',
@@ -195,7 +278,7 @@ export default function Facturi() {
                   border: `1px solid ${lunaActuala?.id === luna.id ? 'var(--t4)' : 'transparent'}`
                 }}>
                 <div style={{flex:1}}>
-                  <div style={{fontSize:13,fontWeight:700,color:'var(--text)'}}>{LUNI_NUME[luna.luna]} {luna.an}</div>
+                  <div style={{fontSize:13,fontWeight:700,color:'var(--text)'}}>{LUNI_NUME[luna.luna]} {luna.an}{luna.valoare_estimata ? ' · estimat' : ''}{luna.dif_corina_ron ? ` · dif. ${fmt(luna.dif_corina_ron)} RON` : ''}</div>
                   <div style={{fontSize:11,color:'var(--text3)'}}>{luna.consum_facturat} mc · {luna.pret_per_mc?.toFixed(2)} RON/mc</div>
                 </div>
                 <div style={{textAlign:'right'}}>

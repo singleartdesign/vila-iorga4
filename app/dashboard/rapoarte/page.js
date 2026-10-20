@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
+import { verificaLuna, AlerteLuna, driveUrl, fmt, CULORI_AP } from '@/lib/verificari'
 
 const LUNI_NUME = ['','Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Nov','Dec']
 const CULORI = ['#e07b39','#2563a8','#059669','#7c3aed','#b91c1c']
@@ -11,6 +12,7 @@ export default function Rapoarte() {
   const [luni, setLuni] = useState([])
   const [lunaSelectata, setLunaSelectata] = useState(null)
   const [situatie, setSituatie] = useState([])
+  const [citiriLuna, setCitiriLuna] = useState([])
   const [loading, setLoading] = useState(true)
   const router = useRouter()
   const supabase = createClient()
@@ -22,7 +24,7 @@ export default function Rapoarte() {
     if (!user) { router.push('/login'); return }
     const { data: prof } = await supabase.from('profiles').select('*').eq('id', user.id).single()
     setProfile(prof)
-    const { data: l } = await supabase.from('luni_facturare').select('*').order('an', { ascending: false }).order('luna', { ascending: false }).limit(24)
+    const { data: l } = await supabase.from('luni_facturare').select('*').order('an', { ascending: false }).order('luna', { ascending: false }).limit(60)
     setLuni(l || [])
     if (l && l.length > 0) {
       setLunaSelectata(l[0])
@@ -48,6 +50,7 @@ export default function Rapoarte() {
       }
     }).sort((a,b) => a.apartamente.numar - b.apartamente.numar)
     setSituatie(combined)
+    setCitiriLuna(cit || [])
   }
 
   async function selectLuna(luna) {
@@ -124,6 +127,30 @@ export default function Rapoarte() {
           </div>
         )}
 
+        {/* VERIFICARI + ACTIUNI */}
+        {lunaSelectata && (
+          <div style={{background:'#fff',borderRadius:'var(--r)',padding:'14px',boxShadow:'var(--shadow)',border:'1px solid var(--border)',display:'flex',flexDirection:'column',gap:10}}>
+            <AlerteLuna probleme={verificaLuna(lunaSelectata, citiriLuna)} />
+            {(lunaSelectata.nr_factura || lunaSelectata.index_general_nou != null) && (
+              <div style={{fontSize:12,color:'var(--text2)'}}>
+                {lunaSelectata.nr_factura && <>Factura nr. <strong>{lunaSelectata.nr_factura}</strong>{lunaSelectata.data_factura ? ` din ${lunaSelectata.data_factura.split('-').reverse().join('.')}` : ''}. </>}
+                {lunaSelectata.index_general_nou != null && <>Contor general: {fmt(lunaSelectata.index_general_vechi,0)} → {fmt(lunaSelectata.index_general_nou,0)}.</>}
+              </div>
+            )}
+            {profile?.rol === 'administrator' && (lunaSelectata.dif_corina_ron || lunaSelectata.nota_corina) && (
+              <div style={{fontSize:12,padding:'8px 12px',background:'var(--l7)',borderRadius:10,color:'var(--l1)'}}>
+                Diferenta fata de calculul vechi: {fmt(lunaSelectata.dif_corina_mc)} mc / {fmt(lunaSelectata.dif_corina_ron)} RON{lunaSelectata.nota_corina ? ` · ${lunaSelectata.nota_corina}` : ''}
+              </div>
+            )}
+            <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+              <a href={`/dashboard/rapoarte/pdf?luna=${lunaSelectata.id}`} target="_blank" rel="noreferrer" style={{flex:1,minWidth:140,textAlign:'center',padding:'11px',borderRadius:12,background:'linear-gradient(135deg,var(--l3),var(--t2))',color:'#fff',fontSize:13,fontWeight:800,textDecoration:'none'}}>📄 Raport PDF pentru grup</a>
+              {lunaSelectata.drive_folder_id && (
+                <a href={driveUrl(lunaSelectata.drive_folder_id)} target="_blank" rel="noreferrer" style={{flex:1,minWidth:140,textAlign:'center',padding:'11px',borderRadius:12,background:'var(--l7)',border:'1.5px solid var(--l5)',color:'var(--l1)',fontSize:13,fontWeight:800,textDecoration:'none'}}>📁 Poze apometre si aviz</a>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* SUMAR PLATI */}
         <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10}}>
           <div style={{background:'#fff',borderRadius:'var(--r)',padding:'14px',boxShadow:'var(--shadow)',textAlign:'center'}}>
@@ -157,7 +184,7 @@ export default function Rapoarte() {
               return (
                 <div key={item.id} style={{padding:'12px',background:'var(--bg)',borderRadius:'var(--r-sm)',borderLeft:`3px solid ${statusColor[status]}`}}>
                   <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:6}}>
-                    <div style={{width:32,height:32,borderRadius:'50%',background:CULORI[i%5],display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontWeight:800,fontSize:11,flexShrink:0}}>
+                    <div style={{width:32,height:32,borderRadius:'50%',background:CULORI_AP[item.apartamente.numar] || CULORI[i%5],display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontWeight:800,fontSize:11,flexShrink:0}}>
                       {item.apartamente.proprietar_nume.substring(0,2).toUpperCase()}
                     </div>
                     <div style={{flex:1}}>
