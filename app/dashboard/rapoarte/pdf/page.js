@@ -150,7 +150,11 @@ function RaportPdf() {
           ))}
         </div>
         <div style={{ background: '#efeaf8', borderRadius: 8, padding: '10px 12px', marginTop: 10, fontSize: 11, lineHeight: 1.5 }}>
-          <strong>* Ajustare:</strong> diferența de {(dif >= 0 ? '+' : '−') + fmt(Math.abs(dif))} mc se împarte proporțional cu consumul fiecăruia (cine consumă mai mult preia o parte mai mare). Apartamentele fără consum nu plătesc diferențe. Total de plată = exact valoarea facturii.
+          <strong>* Ajustare:</strong> {luna.mod_repartizare === 'special'
+            ? <>diferența de {(dif >= 0 ? '+' : '−') + fmt(Math.abs(dif))} mc a fost atribuită integral unui singur apartament (decizie pentru luna aceasta). Total de plată = exact valoarea facturii.</>
+            : luna.mod_repartizare === 'egal'
+              ? <>diferența de {(dif >= 0 ? '+' : '−') + fmt(Math.abs(dif))} mc se împarte egal la toate apartamentele. Total de plată = exact valoarea facturii.</>
+              : <>diferența de {(dif >= 0 ? '+' : '−') + fmt(Math.abs(dif))} mc se împarte proporțional cu consumul fiecăruia (cine consumă mai mult preia o parte mai mare). Apartamentele fără consum nu plătesc diferențe. Total de plată = exact valoarea facturii.</>}
           {Math.abs(dif) > Math.max(2, mc * 0.1) && <><br /><strong style={{ color: '#a85a12' }}>Diferență mare luna aceasta: verific citirile și apometrele.</strong></>}
         </div>
 
