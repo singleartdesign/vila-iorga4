@@ -44,6 +44,9 @@ export default function LoginPage() {
           <div>
             <div style={{ fontWeight: 700, fontSize: 20, color: '#1e293b' }}>Vila Iorga 4</div>
             <div style={{ fontSize: 12, color: '#94a3b8' }}>Administrare consum apă</div>
+            <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>
+              Versiunea {process.env.NEXT_PUBLIC_APP_VERSION} din {process.env.NEXT_PUBLIC_BUILD_DATE}{process.env.NEXT_PUBLIC_COMMIT ? ` · ${process.env.NEXT_PUBLIC_COMMIT}` : ''}
+            </div>
           </div>
         </div>
 

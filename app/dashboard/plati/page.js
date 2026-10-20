@@ -175,7 +175,7 @@ export default function Plati() {
                       <div style={{fontSize:10,fontWeight:700,color:'var(--text2)'}}>{sumaConsum.toFixed(2)} RON</div>
                     </div>
                     <div style={{padding:'8px',background:'#fff7ed',borderRadius:8,textAlign:'center',border:'1px solid #fed7aa'}}>
-                      <div style={{fontSize:9,color:'#b45309',fontWeight:600,marginBottom:2}}>Pierdere</div>
+                      <div style={{fontSize:9,color:'#b45309',fontWeight:600,marginBottom:2}}>Ajustare</div>
                       <div style={{fontSize:11,fontWeight:800,color:'#f97316'}}>{pierdereRepartizata.toFixed(2)} mc</div>
                       <div style={{fontSize:10,fontWeight:700,color:'#f97316'}}>{sumaPierdere.toFixed(2)} RON</div>
                     </div>
@@ -226,7 +226,7 @@ export default function Plati() {
                 <div style={{fontSize:9,color:'var(--text3)'}}>RON</div>
               </div>
               <div style={{padding:'10px',background:'#fff7ed',borderRadius:10,textAlign:'center',border:'1px solid #fed7aa'}}>
-                <div style={{fontSize:9,color:'#b45309',marginBottom:2}}>Pierdere</div>
+                <div style={{fontSize:9,color:'#b45309',marginBottom:2}}>Ajustare</div>
                 <div style={{fontSize:12,fontWeight:800,color:'#f97316'}}>{((modal.pierdere_repartizata||0)*pretPerMc).toFixed(2)}</div>
                 <div style={{fontSize:9,color:'var(--text3)'}}>RON</div>
               </div>

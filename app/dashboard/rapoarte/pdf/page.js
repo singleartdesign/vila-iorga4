@@ -174,8 +174,13 @@ function RaportPdf() {
 
         <div style={{ marginTop: 16, fontSize: 11.5, lineHeight: 1.6 }}>
           <strong>Plata</strong><br />
-          Prin transfer către Ștefan Vlad (RON), cu mențiunea „Apă {LUNI[luna.luna - 1]} Ap. X”:<br />
-          ING: <strong>RO92 INGB 0000 9999 0052 0242</strong> &nbsp;·&nbsp; Revolut: <strong>RO45 REVO 0000 1364 3298 8060</strong><br />
+          {luna.an * 12 + luna.luna <= 2026 * 12 + 9 ? <>
+            Factura pe {LUNI[luna.luna - 1]} a fost achitată deja de Corina, deci suma pentru luna aceasta se dă <strong>Corinei</strong>, ca până acum.<br />
+            De la consumul din octombrie, plata se face prin transfer către Ștefan Vlad (RON): ING <strong>RO92 INGB 0000 9999 0052 0242</strong> · Revolut <strong>RO45 REVO 0000 1364 3298 8060</strong>.<br />
+          </> : <>
+            Prin transfer către Ștefan Vlad (RON), cu mențiunea „Apă {LUNI[luna.luna - 1]} Ap. X”:<br />
+            ING: <strong>RO92 INGB 0000 9999 0052 0242</strong> &nbsp;·&nbsp; Revolut: <strong>RO45 REVO 0000 1364 3298 8060</strong><br />
+          </>}
           Vă rog să trimiteți pe grup o confirmare după plată.<br />
           Citirile pentru luna următoare: pe 24, cu poză clară la apometru (cifrele negre și roșii), chiar dacă nu ați consumat.
         </div>

@@ -239,7 +239,7 @@ export default function Dashboard() {
           {[
             {label:'Colectat',val:totalColectat.toFixed(0),unit:'RON',color:'var(--t1)'},
             {label:'Restante',val:totalRestant.toFixed(0),unit:'RON',color:nrRestante>0?'#f97316':'var(--t1)'},
-            {label:'Pierdere apa',val:Math.abs(pierdere).toFixed(2),unit:'mc',color:'#f97316'},
+            {label: pierdere > 0.005 ? 'Contor general peste apometre' : pierdere < -0.005 ? 'Apometre peste contor general' : 'Contor general = apometre', val:(pierdere > 0.005 ? '+' : pierdere < -0.005 ? '−' : '')+Math.abs(pierdere).toFixed(2),unit:'mc',color:Math.abs(pierdere) > 0.005 ? '#f97316' : 'var(--t1)'},
             {label:'Citiri',val:`${citiri.length}/5`,unit:'introduse',color:'var(--l2)'},
           ].map(s => (
             <div key={s.label} style={{background:'#fff',borderRadius:'var(--r)',padding:'14px 16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
@@ -267,13 +267,15 @@ export default function Dashboard() {
                   </div>
                   <div style={{flex:1,minWidth:0}}>
                     <div style={{fontSize:13,fontWeight:700,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{calc.apartamente.proprietar_nume}</div>
-                    <div style={{fontSize:11,color:'var(--text3)'}}>Ap. {calc.apartamente.numar} · {calc.consum_individual?.toFixed(2)} mc + <span style={{color:'#f97316'}}>{calc.pierdere_repartizata?.toFixed(2)} mc</span></div>
+                    <div style={{fontSize:11,color:'var(--text3)'}}>Ap. {calc.apartamente.numar} · {Number(calc.consum_individual).toFixed(2)} mc{Math.abs(Number(calc.pierdere_repartizata)) > 0.005 && <> · ajustare <span style={{color:'#f97316'}}>{Number(calc.pierdere_repartizata) > 0 ? '+' : '−'}{Math.abs(Number(calc.pierdere_repartizata)).toFixed(2)} mc</span></>}</div>
                   </div>
                   <div style={{textAlign:'right'}}>
-                    <div style={{fontSize:10,color:'var(--text3)',marginBottom:2}}>
-                      {(calc.consum_individual * lunaActuala?.pret_per_mc).toFixed(2)} + <span style={{color:'#f97316'}}>{(calc.pierdere_repartizata * lunaActuala?.pret_per_mc).toFixed(2)}</span> RON
-                    </div>
-                    <div style={{fontSize:14,fontWeight:800,color:c.text,fontFamily:'Sora,sans-serif'}}>{calc.suma_calculata?.toFixed(2)} RON</div>
+                    {Math.abs(Number(plata?.sold_anterior) || 0) > 0.005 && (
+                      <div style={{fontSize:10,color:'var(--text3)',marginBottom:2}}>
+                        luna {Number(calc.suma_calculata).toFixed(2)} {Number(plata.sold_anterior) < 0 ? `− avans ${(-Number(plata.sold_anterior)).toFixed(2)}` : `+ restanta ${Number(plata.sold_anterior).toFixed(2)}`}
+                      </div>
+                    )}
+                    <div style={{fontSize:14,fontWeight:800,color:c.text,fontFamily:'Sora,sans-serif'}}>{((Number(calc.suma_calculata)||0)+(Number(plata?.sold_anterior)||0)).toFixed(2)} RON</div>
                     <div style={{fontSize:10,fontWeight:700,color:c.text}}>{c.label}</div>
                   </div>
                 </div>

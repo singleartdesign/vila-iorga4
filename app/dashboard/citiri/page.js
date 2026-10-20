@@ -162,9 +162,9 @@ export default function Citiri() {
                 <div style={{fontSize:10,color:'var(--text3)'}}>mc</div>
               </div>
               <div style={{textAlign:'center'}}>
-                <div style={{fontSize:10,color:'var(--text3)',fontWeight:600,textTransform:'uppercase',marginBottom:4}}>Pierdere</div>
-                <div style={{fontSize:18,fontWeight:800,color:pierdere > 0 ? '#f97316' : 'var(--t1)',fontFamily:'Sora,sans-serif'}}>{pierdere.toFixed(2)}</div>
-                <div style={{fontSize:10,color:'var(--text3)'}}>mc</div>
+                <div style={{fontSize:10,color:'var(--text3)',fontWeight:600,textTransform:'uppercase',marginBottom:4}}>Diferenta</div>
+                <div style={{fontSize:18,fontWeight:800,color:Math.abs(pierdere) > 0.005 ? '#f97316' : 'var(--t1)',fontFamily:'Sora,sans-serif'}}>{pierdere > 0.005 ? '+' : ''}{pierdere.toFixed(2)}</div>
+                <div style={{fontSize:10,color:'var(--text3)'}}>{pierdere > 0.005 ? 'mc, general > apometre' : pierdere < -0.005 ? 'mc, apometre > general' : 'mc'}</div>
               </div>
             </div>
           </div>
