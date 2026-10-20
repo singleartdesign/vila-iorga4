@@ -136,9 +136,22 @@ function RaportPdf() {
           </tbody>
         </table>
 
-        <div style={{ background: '#efeaf8', borderRadius: 8, padding: '10px 12px', marginTop: 14, fontSize: 11, lineHeight: 1.5 }}>
-          <strong>* Diferența dintre contorul general și suma apometrelor: {(dif >= 0 ? '+' : '−') + fmt(Math.abs(dif))} mc</strong><br />
-          Se împarte proporțional cu consumul fiecăruia (cine consumă mai mult preia o parte mai mare). Apartamentele fără consum nu plătesc diferențe. Total de plată = exact valoarea facturii.
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginTop: 14 }}>
+          {[
+            ['Suma apometrelor individuale', `${fmt(sumaAp)} mc`, 'Ap. 1 + 2 + 3 + 4 + 5'],
+            ['Contor general (facturat)', `${fmt(mc)} mc`, luna.index_general_nou != null ? `${fmt(luna.index_general_vechi, 0)} → ${fmt(luna.index_general_nou, 0)}` : 'pe factura Compania Apa'],
+            ['Diferență', `${(dif >= 0 ? '+' : '−') + fmt(Math.abs(dif))} mc`, dif > 0.005 ? 'contorul general arată mai mult' : dif < -0.005 ? 'apometrele arată mai mult' : 'se potrivesc exact'],
+          ].map(([t, v, sub], i) => (
+            <div key={t} style={{ border: `1.5px solid ${i === 2 && Math.abs(dif) > Math.max(2, mc * 0.1) ? '#e08a3c' : LINE}`, borderRadius: 8, padding: '8px 12px' }}>
+              <div style={{ fontSize: 10.5, color: GREY }}>{t}</div>
+              <div style={{ fontSize: 17, fontWeight: 800 }}>{v}</div>
+              <div style={{ fontSize: 9.5, color: GREY }}>{sub}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ background: '#efeaf8', borderRadius: 8, padding: '10px 12px', marginTop: 10, fontSize: 11, lineHeight: 1.5 }}>
+          <strong>* Ajustare:</strong> diferența de {(dif >= 0 ? '+' : '−') + fmt(Math.abs(dif))} mc se împarte proporțional cu consumul fiecăruia (cine consumă mai mult preia o parte mai mare). Apartamentele fără consum nu plătesc diferențe. Total de plată = exact valoarea facturii.
+          {Math.abs(dif) > Math.max(2, mc * 0.1) && <><br /><strong style={{ color: '#a85a12' }}>Diferență mare luna aceasta: verific citirile și apometrele.</strong></>}
         </div>
 
         <div style={{ fontFamily: 'Sora,sans-serif', fontWeight: 700, fontSize: 14, margin: '20px 0 6px' }}>Consum pe ultimele 12 luni (mc)</div>
