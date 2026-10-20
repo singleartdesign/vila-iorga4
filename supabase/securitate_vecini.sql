@@ -13,3 +13,6 @@ create policy "Admin si manager introduc citiri" on citiri for insert
   with check (get_rol() = any (array['administrator','manager']));
 create policy "Admin si manager modifica citiri" on citiri for update
   using (get_rol() = any (array['administrator','manager']));
+
+-- 21.10.2026: toti vecinii vad situatia platilor (aceleasi sume ca in PDF-ul de pe grup). Scrierea ramane doar la admin.
+create policy "Toti vad platile" on plati for select to authenticated using (true);
