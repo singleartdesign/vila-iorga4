@@ -176,6 +176,7 @@ function RaportPdf() {
         </div>
 
         <div style={{ fontFamily: 'Sora,sans-serif', fontWeight: 700, fontSize: 14, margin: '20px 0 6px' }}>Consum pe ultimele 12 luni (mc)</div>
+        <div style={{ fontSize: 10.5, color: GREY, marginTop: -2, marginBottom: 4 }}>Barele = suma apometrelor (fiecare culoare e un apartament). Linia neagră = contorul general facturat. Distanța dintre ele = diferența din luna respectivă.</div>
         <Grafic ultimele={ultimele} ist={ist} apartamente={apartamente} />
 
         <div style={{ marginTop: 16, fontSize: 11.5, lineHeight: 1.6 }}>
@@ -207,7 +208,7 @@ function Grafic({ ultimele, ist, apartamente }) {
     const x = ist.find(i => i.luna_id === lid && i.apartamente?.numar === ap)
     return x ? Math.max(0, Number(x.consum_individual) || 0) : 0
   }
-  const max = Math.max(1, ...ultimele.map(l => Number(l.consum_facturat) || 0), ...ultimele.flatMap(l => apartamente.map(a => val(l.id, a))))
+  const max = Math.max(1, ...ultimele.map(l => Number(l.consum_facturat) || 0), ...ultimele.map(l => apartamente.reduce((t, a) => t + val(l.id, a), 0)))
   const pas = max > 20 ? 5 : 2
   const top = Math.ceil(max / pas) * pas
   const gw = (W - pl - 6) / n
@@ -224,11 +225,16 @@ function Grafic({ ultimele, ist, apartamente }) {
       ))}
       {ultimele.map((l, i) => (
         <g key={l.id}>
-          {apartamente.map((a, k) => {
-            const v = val(l.id, a)
-            const x = pl + gw * i + gw / 2 - (apartamente.length * bw) / 2 + k * bw
-            return <rect key={a} x={x} y={y(v)} width={bw - 1} height={Math.max(0, H - pb - y(v))} fill={CULORI_AP[a]} />
-          })}
+          {(() => {
+            let baza = 0
+            const lat = Math.min(26, gw - 10)
+            return apartamente.map(a => {
+              const v = val(l.id, a)
+              const y0 = y(baza), y1 = y(baza + v)
+              baza += v
+              return <rect key={a} x={pl + gw * i + gw / 2 - lat / 2} y={y1} width={lat} height={Math.max(0, y0 - y1)} fill={CULORI_AP[a]} />
+            })
+          })()}
           <text x={pl + gw * i + gw / 2} y={H - pb + 13} fontSize="8" textAnchor="middle" fill={GREY}>{LUNI[l.luna - 1].slice(0, 3)} {String(l.an).slice(2)}</text>
         </g>
       ))}
