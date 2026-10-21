@@ -175,11 +175,12 @@ function RaportPdf() {
           {Math.abs(dif) > Math.max(2, mc * 0.1) && <><br /><strong style={{ color: '#a85a12' }}>Diferență mare luna aceasta: verific citirile și apometrele.</strong></>}
         </div>
 
-        <div style={{ fontFamily: 'Sora,sans-serif', fontWeight: 700, fontSize: 14, margin: '20px 0 6px' }}>Consum pe ultimele 12 luni (mc)</div>
-        <div style={{ fontSize: 10.5, color: GREY, marginTop: -2, marginBottom: 4 }}>Barele = suma apometrelor (fiecare culoare e un apartament). Linia neagră = contorul general facturat. Distanța dintre ele = diferența din luna respectivă.</div>
-        <Grafic ultimele={ultimele} ist={ist} apartamente={apartamente} />
+        <div style={{ fontFamily: 'Sora,sans-serif', fontWeight: 700, fontSize: 14, margin: '14px 0 2px' }}>Consum pe apartament, ultimele 12 luni (mc)</div>
+        <GraficApartamente ultimele={ultimele} ist={ist} apartamente={apartamente} />
+        <div style={{ fontFamily: 'Sora,sans-serif', fontWeight: 700, fontSize: 12, margin: '6px 0 2px' }}>Total clădire: apometre vs contor general (mc)</div>
+        <GraficTotal ultimele={ultimele} ist={ist} apartamente={apartamente} />
 
-        <div style={{ marginTop: 16, fontSize: 11.5, lineHeight: 1.6 }}>
+        <div style={{ marginTop: 8, fontSize: 11, lineHeight: 1.5 }}>
           <strong>Plata</strong><br />
           {luna.an * 12 + luna.luna <= 2026 * 12 + 9 ? <>
             Factura pe {LUNI[luna.luna - 1]} a fost achitată deja de Corina, deci suma pentru luna aceasta se dă <strong>Corinei</strong>, ca până acum.<br />
@@ -201,54 +202,78 @@ function RaportPdf() {
   )
 }
 
-function Grafic({ ultimele, ist, apartamente }) {
-  const W = 680, H = 210, pl = 30, pb = 26, pt = 26
-  const n = ultimele.length
-  const val = (lid, ap) => {
-    const x = ist.find(i => i.luna_id === lid && i.apartamente?.numar === ap)
-    return x ? Math.max(0, Number(x.consum_individual) || 0) : 0
-  }
-  const max = Math.max(1, ...ultimele.map(l => Number(l.consum_facturat) || 0), ...ultimele.map(l => apartamente.reduce((t, a) => t + val(l.id, a), 0)))
-  const pas = max > 20 ? 5 : 2
+function valoare(ist, lid, ap) {
+  const x = ist.find(i => i.luna_id === lid && i.apartamente?.numar === ap)
+  return x ? Math.max(0, Number(x.consum_individual) || 0) : 0
+}
+
+function Axe({ W, H, pl, pb, top, pas, y, ultimele, gw }) {
+  return <>
+    {Array.from({ length: top / pas + 1 }, (_, k) => k * pas).map(v => (
+      <g key={v}>
+        <line x1={pl} x2={W - 4} y1={y(v)} y2={y(v)} stroke="#eef1f3" />
+        <text x={pl - 5} y={y(v) + 3} fontSize="8" textAnchor="end" fill={GREY}>{v}</text>
+      </g>
+    ))}
+    {ultimele.map((l, i) => <text key={l.id} x={pl + gw * i + gw / 2} y={H - pb + 13} fontSize="8" textAnchor="middle" fill={GREY}>{LUNI[l.luna - 1].slice(0, 3)} {String(l.an).slice(2)}</text>)}
+  </>
+}
+
+// 1. Comparatie intre apartamente: bare alaturate, aceeasi scara pentru toti
+function GraficApartamente({ ultimele, ist, apartamente }) {
+  const W = 680, H = 128, pl = 30, pb = 22, pt = 20
+  const gw = (W - pl - 6) / ultimele.length
+  const max = Math.max(1, ...ultimele.flatMap(l => apartamente.map(a => valoare(ist, l.id, a))))
+  const pas = max > 12 ? 4 : 2
   const top = Math.ceil(max / pas) * pas
-  const gw = (W - pl - 6) / n
-  const bw = Math.min(9, (gw - 8) / Math.max(1, apartamente.length))
   const y = v => pt + (H - pt - pb) * (1 - v / top)
-  const linie = ultimele.map((l, i) => `${pl + gw * i + gw / 2},${y(Number(l.consum_facturat) || 0)}`).join(' ')
+  const bw = Math.min(8, (gw - 8) / Math.max(1, apartamente.length))
   return (
     <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 'auto' }} fontFamily="Nunito,sans-serif">
-      {Array.from({ length: top / pas + 1 }, (_, k) => k * pas).map(v => (
-        <g key={v}>
-          <line x1={pl} x2={W - 4} y1={y(v)} y2={y(v)} stroke="#eef1f3" />
-          <text x={pl - 5} y={y(v) + 3} fontSize="8" textAnchor="end" fill={GREY}>{v}</text>
-        </g>
-      ))}
-      {ultimele.map((l, i) => (
-        <g key={l.id}>
-          {(() => {
-            let baza = 0
-            const lat = Math.min(26, gw - 10)
-            return apartamente.map(a => {
-              const v = val(l.id, a)
-              const y0 = y(baza), y1 = y(baza + v)
-              baza += v
-              return <rect key={a} x={pl + gw * i + gw / 2 - lat / 2} y={y1} width={lat} height={Math.max(0, y0 - y1)} fill={CULORI_AP[a]} />
-            })
-          })()}
-          <text x={pl + gw * i + gw / 2} y={H - pb + 13} fontSize="8" textAnchor="middle" fill={GREY}>{LUNI[l.luna - 1].slice(0, 3)} {String(l.an).slice(2)}</text>
-        </g>
-      ))}
-      <polyline points={linie} fill="none" stroke={INK} strokeWidth="1.3" />
-      {ultimele.map((l, i) => <circle key={l.id} cx={pl + gw * i + gw / 2} cy={y(Number(l.consum_facturat) || 0)} r="2" fill={INK} />)}
+      <Axe W={W} H={H} pl={pl} pb={pb} top={top} pas={pas} y={y} ultimele={ultimele} gw={gw} />
+      {ultimele.map((l, i) => apartamente.map((a, k) => {
+        const v = valoare(ist, l.id, a)
+        const x = pl + gw * i + gw / 2 - (apartamente.length * bw) / 2 + k * bw
+        return <rect key={`${l.id}-${a}`} x={x} y={y(v)} width={bw - 1} height={Math.max(0, H - pb - y(v))} fill={CULORI_AP[a]} />
+      }))}
       <g fontSize="8.5" fill={INK}>
         {apartamente.map((a, k) => (
-          <g key={a} transform={`translate(${pl + k * 58},8)`}>
+          <g key={a} transform={`translate(${pl + k * 58},6)`}>
             <rect width="9" height="9" rx="2" fill={CULORI_AP[a]} /><text x="13" y="8">Ap.{a}</text>
           </g>
         ))}
-        <g transform={`translate(${pl + apartamente.length * 58},8)`}>
-          <line x1="0" x2="14" y1="4.5" y2="4.5" stroke={INK} strokeWidth="1.3" /><text x="18" y="8">Contor general (facturat)</text>
-        </g>
+      </g>
+    </svg>
+  )
+}
+
+// 2. Total cladire: suma apometrelor vs contorul general, cu diferenta scrisa deasupra
+function GraficTotal({ ultimele, ist, apartamente }) {
+  const W = 680, H = 108, pl = 30, pb = 22, pt = 22
+  const gw = (W - pl - 6) / ultimele.length
+  const suma = l => apartamente.reduce((t, a) => t + valoare(ist, l.id, a), 0)
+  const max = Math.max(1, ...ultimele.map(l => Math.max(Number(l.consum_facturat) || 0, suma(l))))
+  const pas = 5
+  const top = Math.ceil(max / pas) * pas
+  const y = v => pt + (H - pt - pb) * (1 - v / top)
+  const lat = Math.min(14, gw / 3)
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 'auto' }} fontFamily="Nunito,sans-serif">
+      <Axe W={W} H={H} pl={pl} pb={pb} top={top} pas={pas} y={y} ultimele={ultimele} gw={gw} />
+      {ultimele.map((l, i) => {
+        const cx = pl + gw * i + gw / 2, s = suma(l), g = Number(l.consum_facturat) || 0, d = g - s
+        return (
+          <g key={l.id}>
+            <rect x={cx - lat - 1} y={y(s)} width={lat} height={Math.max(0, H - pb - y(s))} fill="#7fc4c5" />
+            <rect x={cx + 1} y={y(g)} width={lat} height={Math.max(0, H - pb - y(g))} fill={INK} />
+            {Math.abs(d) >= 0.5 && <text x={cx} y={Math.min(y(s), y(g)) - 4} fontSize="8" textAnchor="middle" fill={d > 0 ? '#a85a12' : GREY} fontWeight="700">{(d > 0 ? '+' : '−') + fmt(Math.abs(d), 1)}</text>}
+          </g>
+        )
+      })}
+      <g fontSize="8.5" fill={INK}>
+        <g transform={`translate(${pl},6)`}><rect width="9" height="9" rx="2" fill="#7fc4c5" /><text x="13" y="8">Suma apometrelor</text></g>
+        <g transform={`translate(${pl + 110},6)`}><rect width="9" height="9" rx="2" fill={INK} /><text x="13" y="8">Contor general (facturat)</text></g>
+        <g transform={`translate(${pl + 250},6)`}><text y="8" fill={GREY}>cifra de deasupra = diferența (mc)</text></g>
       </g>
     </svg>
   )
