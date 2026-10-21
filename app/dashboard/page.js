@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
+import { sumaApometreCorectata } from '@/lib/verificari'
 
 const LUNI_NUME = ['','Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Nov','Dec']
 const CULORI = ['#e07b39','#2563a8','#059669','#7c3aed','#b91c1c']
@@ -175,7 +176,7 @@ export default function Dashboard() {
   const totalFactura = lunaActuala?.valoare_factura || 0
   const totalColectat = plati.reduce((s,p) => s+(p.suma_platita||0), 0)
   const totalRestant = plati.reduce((s,p) => s+Math.max(0,(Number(p.suma_calculata)||0)+(Number(p.sold_anterior)||0)-(Number(p.suma_platita)||0)), 0)
-  const pierdere = lunaActuala ? lunaActuala.consum_facturat - citiri.reduce((s,c) => s+(c.consum||0), 0) : 0
+  const pierdere = lunaActuala ? lunaActuala.consum_facturat - sumaApometreCorectata(citiri) : 0
   const nrRestante = plati.filter(p => (Number(p.suma_calculata)||0)+(Number(p.sold_anterior)||0)>(Number(p.suma_platita)||0)+0.005).length
   const lunaNume = lunaActuala ? `${LUNI_NUME[lunaActuala.luna]} ${lunaActuala.an}` : ''
   const consumData = istoricLuni.map(l => ({luna:l.luna, an:l.an, consum_facturat:l.consum_facturat}))

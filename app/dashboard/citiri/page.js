@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
+import { sumaApometreCorectata } from '@/lib/verificari'
 
 const LUNI_NUME = ['','Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Nov','Dec']
 const CULORI = ['#e07b39','#2563a8','#059669','#7c3aed','#b91c1c']
@@ -123,7 +124,7 @@ export default function Citiri() {
   }
 
   const lunaNume = lunaActuala ? `${LUNI_NUME[lunaActuala.luna]} ${lunaActuala.an}` : ''
-  const totalConsum = citiri.reduce((s, c) => s + (c.consum || 0), 0)
+  const totalConsum = sumaApometreCorectata(citiri)
   const pierdere = lunaActuala ? lunaActuala.consum_facturat - totalConsum : 0
 
   if (loading) return (

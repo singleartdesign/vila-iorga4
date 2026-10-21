@@ -43,6 +43,7 @@ function RaportPdf() {
         numar: c.apartamente?.numar, nume: c.apartamente?.proprietar_nume,
         iv: ci.index_vechi, inn: ci.index_nou,
         consum: Number(c.consum_individual) || 0,
+        contor: c.consum_contor != null ? Number(c.consum_contor) : Number(c.consum_individual) || 0,
         mc: Number(c.mc_de_plata) || 0,
         suma: Number(c.suma_calculata) || 0,
         sold: Number(p.sold_anterior) || 0,
@@ -127,7 +128,7 @@ function RaportPdf() {
                 <tr key={r.numar}>
                   <td style={{ fontWeight: 800 }}>{r.numar}</td>
                   <td><span style={{ display: 'inline-block', width: 9, height: 9, borderRadius: '50%', background: CULORI_AP[r.numar], marginRight: 7, verticalAlign: 'middle' }} />{r.nume}</td>
-                  <td>{fmt(r.iv)}</td><td>{fmt(r.inn)}</td><td>{fmt(r.consum)}</td>
+                  <td>{fmt(r.iv)}</td><td>{fmt(r.inn)}</td><td>{fmt(r.consum)}{Math.abs(r.contor - r.consum) > 0.004 ? '**' : ''}</td>
                   <td>{(adj >= 0 ? '+' : '−') + fmt(Math.abs(adj))}</td>
                   <td>{fmt(r.mc)}</td>
                   <td style={areSold ? {} : { fontWeight: 800, color: T1, fontSize: 12.5 }}>{fmt(r.suma)}{areSold ? '' : ' lei'}</td>
@@ -147,9 +148,14 @@ function RaportPdf() {
           </tbody>
         </table>
 
+        {randuri.some(r => Math.abs(r.contor - r.consum) > 0.004) && (
+          <div style={{ fontSize: 10.5, color: GREY, marginTop: 8, lineHeight: 1.5 }}>
+            ** {randuri.filter(r => Math.abs(r.contor - r.consum) > 0.004).map(r => `Ap. ${r.numar}: apometrul arată ${fmt(r.contor)} mc, dar înregistrează și consumul Ap. 1 (țeava Ap. 1 trece prin contorul Ap. 3). Consum propriu: ${fmt(r.consum)} mc.`).join(' ')}
+          </div>
+        )}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginTop: 14 }}>
           {[
-            ['Suma apometrelor individuale', `${fmt(sumaAp)} mc`, 'Ap. 1 + 2 + 3 + 4 + 5'],
+            ['Suma apometrelor individuale', `${fmt(sumaAp)} mc`, randuri.some(r => Math.abs(r.contor - r.consum) > 0.004) ? 'fără dublarea Ap. 1 prin contorul Ap. 3' : 'Ap. 1 + 2 + 3 + 4 + 5'],
             ['Contor general (facturat)', `${fmt(mc)} mc`, luna.index_general_nou != null ? `${fmt(luna.index_general_vechi, 0)} → ${fmt(luna.index_general_nou, 0)}` : 'pe factura Compania Apa'],
             ['Diferență', `${(dif >= 0 ? '+' : '−') + fmt(Math.abs(dif))} mc`, dif > 0.005 ? 'contorul general arată mai mult' : dif < -0.005 ? 'apometrele arată mai mult' : 'se potrivesc exact'],
           ].map(([t, v, sub], i) => (
