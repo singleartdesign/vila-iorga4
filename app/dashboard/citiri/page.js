@@ -19,6 +19,7 @@ export default function Citiri() {
   const [formData, setFormData] = useState({ index_vechi: '', index_nou: '', contor_nou: false, index_final_vechi: '', index_start_nou: '' })
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState('')
+  const [poza, setPoza] = useState(null)
   const router = useRouter()
   const supabase = createClient()
 
@@ -57,11 +58,18 @@ export default function Citiri() {
     return citiriPrecedente.find(c => c.apartament_id === aptId)
   }
 
+  const esteAdmin = profile?.rol === 'administrator' || profile?.rol === 'manager'
+
   function canEdit(apt) {
     if (!profile) return false
-    if (profile.rol === 'administrator' || profile.rol === 'manager') return true
-    if (profile.rol === 'proprietar' && profile.apartament_id === apt.id) return true
+    if (esteAdmin) return true
+    if (profile.rol === 'proprietar' && profile.apartament_id === apt.id && !lunaActuala?.validata) return true
     return false
+  }
+
+  async function deschidePoza(path) {
+    const { data, error } = await supabase.storage.from('citiri-poze').createSignedUrl(path, 3600)
+    if (!error && data?.signedUrl) window.open(data.signedUrl, '_blank')
   }
 
   function openModal(apt) {
@@ -76,6 +84,7 @@ export default function Citiri() {
       index_start_nou: '0'
     })
     setModal(apt)
+    setPoza(null)
     setMsg('')
   }
 
@@ -103,17 +112,28 @@ export default function Citiri() {
       if (index_nou < index_vechi) { setMsg('Indexul nou trebuie sa fie mai mare sau egal cu cel vechi!'); return }
     }
 
+    if (!esteAdmin && !poza && !citireExistenta?.poza_path) { setMsg('Adauga si poza apometrului, te rog.'); return }
+
     setSaving(true)
+    let poza_path = citireExistenta?.poza_path || null
+    if (poza) {
+      const ext = (poza.name.split('.').pop() || 'jpg').toLowerCase()
+      const cale = `${lunaActuala.id}/${modal.id}/${Date.now()}.${ext}`
+      const { error: eu } = await supabase.storage.from('citiri-poze').upload(cale, poza, { contentType: poza.type || 'image/jpeg' })
+      if (eu) { setMsg('Poza nu s-a putut incarca: ' + eu.message); setSaving(false); return }
+      poza_path = cale
+    }
+
     let error
     if (citireExistenta) {
       const { error: e } = await supabase.from('citiri').update({
-        index_vechi, index_nou, introdus_de: user.id, introdus_la: new Date().toISOString()
+        index_vechi, index_nou, poza_path, introdus_de: user.id, introdus_la: new Date().toISOString()
       }).eq('id', citireExistenta.id)
       error = e
     } else {
       const { error: e } = await supabase.from('citiri').insert({
         luna_id: lunaActuala.id, apartament_id: modal.id,
-        index_vechi, index_nou, introdus_de: user.id
+        index_vechi, index_nou, poza_path, introdus_de: user.id
       })
       error = e
     }
@@ -171,6 +191,16 @@ export default function Citiri() {
           </div>
         )}
 
+        {lunaActuala?.validata ? (
+          <div style={{padding:'12px 14px',borderRadius:12,background:'var(--l7)',border:'1px solid var(--l5)',color:'var(--l1)',fontSize:12,fontWeight:600}}>
+            🔒 Luna {lunaNume} e validata. Citirile nu mai pot fi modificate de proprietari.
+          </div>
+        ) : !esteAdmin && (
+          <div style={{padding:'12px 14px',borderRadius:12,background:'var(--t7)',border:'1px solid var(--t5)',color:'var(--t1)',fontSize:12,fontWeight:600,lineHeight:1.5}}>
+            Introdu citirea apometrului tau la apartamentul tau, cu poza clara (cifrele negre si rosii). O poti corecta pana cand administratorul valideaza luna.
+          </div>
+        )}
+
         <div style={{background:'#fff',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
           <div style={{fontFamily:'Sora,sans-serif',fontSize:14,fontWeight:700,marginBottom:12}}>Citiri {lunaNume}</div>
           <div style={{display:'flex',flexDirection:'column',gap:8}}>
@@ -196,6 +226,9 @@ export default function Citiri() {
                       <div style={{fontSize:11,color:'var(--t1)',fontWeight:600,marginTop:2}}>
                         {citire.index_vechi} → {citire.index_nou} = <strong>{consum.toFixed(3)} mc</strong>
                       </div>
+                    )}
+                    {citire?.poza_path && (
+                      <button onClick={() => deschidePoza(citire.poza_path)} style={{marginTop:4,padding:0,border:'none',background:'none',color:'var(--l2)',fontSize:11,fontWeight:700,cursor:'pointer'}}>📷 Vezi poza</button>
                     )}
                     {!hasData && citirePrec && (
                       <div style={{fontSize:10,color:'var(--text3)',marginTop:2}}>
@@ -237,7 +270,7 @@ export default function Citiri() {
             <div style={{fontSize:13,color:'var(--text3)',marginBottom:16}}>{modal.proprietar_nume} · Ap. {modal.numar}</div>
 
             {/* CHECKBOX CONTOR NOU */}
-            <div onClick={() => setFormData({...formData, contor_nou: !formData.contor_nou})}
+            {esteAdmin && <div onClick={() => setFormData({...formData, contor_nou: !formData.contor_nou})}
               style={{display:'flex',alignItems:'center',gap:10,padding:'10px 14px',background:formData.contor_nou?'#fff7ed':'var(--bg)',borderRadius:10,border:`1.5px solid ${formData.contor_nou?'#f97316':'var(--border)'}`,marginBottom:14,cursor:'pointer'}}>
               <div style={{width:20,height:20,borderRadius:5,border:`2px solid ${formData.contor_nou?'#f97316':'var(--border)'}`,background:formData.contor_nou?'#f97316':'#fff',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
                 {formData.contor_nou && <span style={{color:'#fff',fontSize:13,fontWeight:800}}>✓</span>}
@@ -246,7 +279,7 @@ export default function Citiri() {
                 <div style={{fontSize:13,fontWeight:700,color:formData.contor_nou?'#f97316':'var(--text2)'}}>Contor schimbat luna aceasta</div>
                 <div style={{fontSize:11,color:'var(--text3)'}}>Bifeaza daca s-a inlocuit contorul</div>
               </div>
-            </div>
+            </div>}
 
             {formData.contor_nou ? (
               /* MOD CONTOR NOU */
@@ -297,6 +330,7 @@ export default function Citiri() {
                       {getCitirePrecedenta(modal.id) && <span style={{color:'var(--t1)',fontSize:10,marginLeft:4}}>· auto</span>}
                     </label>
                     <input type="number" step="0.001" value={formData.index_vechi}
+                      readOnly={!esteAdmin && !!getCitirePrecedenta(modal.id)}
                       onChange={e => setFormData({...formData, index_vechi: e.target.value})}
                       style={{width:'100%',padding:'11px',border:'1.5px solid var(--border)',borderRadius:10,fontSize:15,fontFamily:'Nunito,sans-serif',outline:'none',background:getCitirePrecedenta(modal.id)?'var(--t7)':'#fff'}}
                       placeholder="0.000"
@@ -322,6 +356,15 @@ export default function Citiri() {
                 )}
               </div>
             )}
+
+            <div style={{marginBottom:12}}>
+              <label style={{display:'block',fontSize:12,fontWeight:600,color:'var(--text2)',marginBottom:5}}>
+                Poza apometru {esteAdmin ? '(optional)' : ''}
+                {getCitire(modal.id)?.poza_path && !poza && <span style={{color:'var(--t1)',fontSize:10,marginLeft:4}}>· exista deja o poza</span>}
+              </label>
+              <input type="file" accept="image/*" capture="environment" onChange={e => setPoza(e.target.files?.[0] || null)}
+                style={{width:'100%',padding:'10px',border:'1.5px dashed var(--border)',borderRadius:10,fontSize:13,fontFamily:'Nunito,sans-serif',background:'var(--bg)'}} />
+            </div>
 
             {msg && <div style={{padding:'10px',background:'#fee2e2',borderRadius:10,color:'#b91c1c',fontSize:13,marginBottom:12}}>{msg}</div>}
 

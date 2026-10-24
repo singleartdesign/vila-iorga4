@@ -256,6 +256,14 @@ export default function Facturi() {
               />
             </div>
 
+            <button onClick={async () => {
+              const v = !lunaActuala.validata
+              const { error } = await supabase.from('luni_facturare').update({ validata: v, validata_la: v ? new Date().toISOString() : null }).eq('id', lunaActuala.id)
+              if (error) { setMsg('Eroare: ' + error.message); setMsgType('error') } else { setMsg(v ? 'Luna validata: citirile sunt blocate pentru proprietari.' : 'Luna deblocata: proprietarii pot corecta citirile.'); setMsgType('success'); await loadData() }
+            }} style={{width:'100%',padding:'11px',marginBottom:10,background:lunaActuala.validata ? 'var(--l7)' : '#fff',border:`1.5px solid ${lunaActuala.validata ? 'var(--l4)' : 'var(--border)'}`,borderRadius:12,color:'var(--l1)',fontSize:13,fontWeight:700,cursor:'pointer'}}>
+              {lunaActuala.validata ? '🔒 Luna validata (apasa ca sa deblochezi citirile)' : '🔓 Valideaza luna (blocheaza citirile proprietarilor)'}
+            </button>
+
             <button onClick={salveazaFactura} disabled={saving} style={{
               width:'100%',padding:'13px',
               background:'linear-gradient(135deg,var(--l3),var(--t2))',
