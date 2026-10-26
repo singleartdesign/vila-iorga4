@@ -5,7 +5,7 @@
 //   Copiaza URL-ul aplicatiei web si trimite-l lui Claude.
 
 const APA_FOLDER_ID = '1ua2gKWB17jVh3NWAGGC3Ge86D9lBC8Sf'
-const SECRET = 'iorga4-EdBF_S7htawz0lXq-POJ3gv5'
+const SECRET = 'PAROLA_SECRETA' // pune aici parola primita de la Claude (nu o publica in repo)
 
 function doPost(e) {
   try {
