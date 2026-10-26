@@ -82,6 +82,7 @@ export default function Facturi() {
       drive_folder_id: form.drive_folder_id.trim() || null,
       actualizat_la: new Date().toISOString()
     }).eq('id', lunaActuala.id)
+    if (!error) { const { error: e2 } = await supabase.rpc('calculeaza_luna', { p_luna_id: lunaActuala.id }); if (e2) console.error(e2) }
     if (error) { setMsg('Eroare: ' + error.message); setMsgType('error') }
     else { setMsg('Factura salvata! Calculele au fost actualizate automat.'); setMsgType('success'); await loadData() }
     setSaving(false)
@@ -262,6 +263,22 @@ export default function Facturi() {
               if (error) { setMsg('Eroare: ' + error.message); setMsgType('error') } else { setMsg(v ? 'Luna validata: citirile sunt blocate pentru proprietari.' : 'Luna deblocata: proprietarii pot corecta citirile.'); setMsgType('success'); await loadData() }
             }} style={{width:'100%',padding:'11px',marginBottom:10,background:lunaActuala.validata ? 'var(--l7)' : '#fff',border:`1.5px solid ${lunaActuala.validata ? 'var(--l4)' : 'var(--border)'}`,borderRadius:12,color:'var(--l1)',fontSize:13,fontWeight:700,cursor:'pointer'}}>
               {lunaActuala.validata ? '🔒 Luna validata (apasa ca sa deblochezi citirile)' : '🔓 Valideaza luna (blocheaza citirile proprietarilor)'}
+            </button>
+
+            <button onClick={async () => {
+              const { data: cit } = await supabase.from('citiri').select('apartament_id, poza_path').eq('luna_id', lunaActuala.id)
+              const cuPoza = (cit || []).filter(c => c.poza_path)
+              if (!cuPoza.length) { setMsg('Nu exista poze pentru luna aceasta.'); setMsgType('error'); return }
+              setMsg(`Se trimit ${cuPoza.length} poze in Drive...`); setMsgType('success')
+              let ok = 0, err = ''
+              for (const c of cuPoza) {
+                const r = await fetch('/api/drive-upload', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ luna_id: lunaActuala.id, apartament_id: c.apartament_id }) })
+                const j = await r.json().catch(() => ({}))
+                if (j.ok) ok++; else err = j.error || r.statusText
+              }
+              setMsg(ok === cuPoza.length ? `Gata: ${ok} poze salvate in Drive.` : `${ok} din ${cuPoza.length} poze salvate. Eroare: ${err}`); setMsgType(ok === cuPoza.length ? 'success' : 'error'); await loadData()
+            }} style={{width:'100%',padding:'11px',marginBottom:10,background:'#fff',border:'1.5px solid var(--border)',borderRadius:12,color:'var(--text2)',fontSize:13,fontWeight:700,cursor:'pointer'}}>
+              📁 Trimite pozele lunii in Drive
             </button>
 
             <button onClick={salveazaFactura} disabled={saving} style={{

@@ -240,7 +240,7 @@ export default function Dashboard() {
           {[
             {label:'Colectat',val:totalColectat.toFixed(0),unit:'RON',color:'var(--t1)'},
             {label:'Restante',val:totalRestant.toFixed(0),unit:'RON',color:nrRestante>0?'#f97316':'var(--t1)'},
-            {label: pierdere > 0.005 ? 'Contor general peste apometre' : pierdere < -0.005 ? 'Apometre peste contor general' : 'Contor general = apometre', val:(pierdere > 0.005 ? '+' : pierdere < -0.005 ? '−' : '')+Math.abs(pierdere).toFixed(2),unit:'mc',color:Math.abs(pierdere) > 0.005 ? '#f97316' : 'var(--t1)'},
+            !(Number(lunaActuala?.consum_facturat) > 0) ? {label:'Factura', val:'in asteptare', unit:'', color:'var(--text3)'} : {label: pierdere > 0.005 ? 'Contor general peste apometre' : pierdere < -0.005 ? 'Apometre peste contor general' : 'Contor general = apometre', val:(pierdere > 0.005 ? '+' : pierdere < -0.005 ? '−' : '')+Math.abs(pierdere).toFixed(2),unit:'mc',color:Math.abs(pierdere) > 0.005 ? '#f97316' : 'var(--t1)'},
             {label:'Citiri',val:`${citiri.length}/5`,unit:'introduse',color:'var(--l2)'},
           ].map(s => (
             <div key={s.label} style={{background:'#fff',borderRadius:'var(--r)',padding:'14px 16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
@@ -259,8 +259,8 @@ export default function Dashboard() {
               const plata = plati.find(p => p.apartament_id===calc.apartament_id)
               const platit = plata?.suma_platita||0
               const rest = Math.max(0, Math.round(((Number(calc.suma_calculata)||0)+(Number(plata?.sold_anterior)||0)-platit)*100)/100)
-              const status = rest===0?'platit':platit>0?'partial':'neplatit'
-              const c = {platit:{border:'var(--t2)',text:'var(--t1)',label:'Platit'},partial:{border:'var(--l4)',text:'var(--l2)',label:'Partial'},neplatit:{border:'#fed7aa',text:'#f97316',label:'Neplatit'}}[status]
+              const status = !(Number(lunaActuala?.consum_facturat) > 0) ? 'asteapta' : rest===0?'platit':platit>0?'partial':'neplatit'
+              const c = {platit:{border:'var(--t2)',text:'var(--t1)',label:'Platit'},partial:{border:'var(--l4)',text:'var(--l2)',label:'Partial'},neplatit:{border:'#fed7aa',text:'#f97316',label:'Neplatit'},asteapta:{border:'var(--border)',text:'var(--text3)',label:'Asteapta factura'}}[status]
               return (
                 <div key={calc.id} style={{display:'flex',alignItems:'center',gap:10,padding:'10px 12px',background:'var(--bg)',borderRadius:'var(--r-sm)',borderLeft:`3px solid ${c.border}`}}>
                   <div style={{width:34,height:34,borderRadius:'50%',background:CULORI[i%5],display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontWeight:800,fontSize:12,flexShrink:0}}>
@@ -268,7 +268,7 @@ export default function Dashboard() {
                   </div>
                   <div style={{flex:1,minWidth:0}}>
                     <div style={{fontSize:13,fontWeight:700,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{calc.apartamente.proprietar_nume}</div>
-                    <div style={{fontSize:11,color:'var(--text3)'}}>Ap. {calc.apartamente.numar} · {Number(calc.consum_individual).toFixed(2)} mc{Math.abs(Number(calc.pierdere_repartizata)) > 0.005 && <> · ajustare <span style={{color:'#f97316'}}>{Number(calc.pierdere_repartizata) > 0 ? '+' : '−'}{Math.abs(Number(calc.pierdere_repartizata)).toFixed(2)} mc</span></>}</div>
+                    <div style={{fontSize:11,color:'var(--text3)'}}>Ap. {calc.apartamente.numar} · {Number(calc.consum_individual).toFixed(2)} mc{Number(lunaActuala?.consum_facturat) > 0 && Math.abs(Number(calc.pierdere_repartizata)) > 0.005 && <> · ajustare <span style={{color:'#f97316'}}>{Number(calc.pierdere_repartizata) > 0 ? '+' : '−'}{Math.abs(Number(calc.pierdere_repartizata)).toFixed(2)} mc</span></>}</div>
                   </div>
                   <div style={{textAlign:'right'}}>
                     {Math.abs(Number(plata?.sold_anterior) || 0) > 0.005 && (

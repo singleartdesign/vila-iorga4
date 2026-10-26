@@ -139,7 +139,10 @@ export default function Citiri() {
     }
 
     if (error) { setMsg('Eroare: ' + error.message) }
-    else { setMsg(''); setModal(null); await loadData() }
+    else {
+      if (poza) fetch('/api/drive-upload', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ luna_id: lunaActuala.id, apartament_id: modal.id }) }).catch(() => {})
+      setMsg(''); setModal(null); await loadData()
+    }
     setSaving(false)
   }
 
