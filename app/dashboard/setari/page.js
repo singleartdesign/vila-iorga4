@@ -16,6 +16,9 @@ export default function Setari() {
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState('')
   const [msgType, setMsgType] = useState('error')
+  const [email, setEmail] = useState('')
+  const [parola, setParola] = useState({ noua: '', confirma: '' })
+  const [msgParola, setMsgParola] = useState({ text: '', tip: 'error' })
   const router = useRouter()
   const supabase = createClient()
 
@@ -26,12 +29,23 @@ export default function Setari() {
     if (!user) { router.push('/login'); return }
     const { data: prof } = await supabase.from('profiles').select('*').eq('id', user.id).single()
     setProfile(prof)
-    if (prof?.rol !== 'administrator') { router.push('/dashboard'); return }
+    setEmail(user.email || '')
+    if (prof?.rol !== 'administrator') { setLoading(false); return }
     const { data: util } = await supabase.from('profiles').select('*, apartamente(numar, proprietar_nume)').order('rol')
     const { data: apt } = await supabase.from('apartamente').select('*').eq('activ', true).order('numar')
     setUtilizatori(util || [])
     setApartamente(apt || [])
     setLoading(false)
+  }
+
+  async function schimbaParola() {
+    if (parola.noua.length < 8) { setMsgParola({ text: 'Parola trebuie sa aiba cel putin 8 caractere.', tip: 'error' }); return }
+    if (parola.noua !== parola.confirma) { setMsgParola({ text: 'Cele doua parole nu coincid.', tip: 'error' }); return }
+    setSaving(true)
+    const { error } = await supabase.auth.updateUser({ password: parola.noua })
+    if (error) setMsgParola({ text: 'Eroare: ' + error.message, tip: 'error' })
+    else { setMsgParola({ text: 'Parola a fost schimbata. Data viitoare te loghezi cu parola noua.', tip: 'success' }); setParola({ noua: '', confirma: '' }) }
+    setSaving(false)
   }
 
   async function schimbaRol(userId, rolNou, apartamentId) {
@@ -117,6 +131,20 @@ export default function Setari() {
           }}>{msg}</div>
         )}
 
+        {/* CONTUL MEU */}
+        <div style={{background:'#fff',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
+          <div style={{fontFamily:'Sora,sans-serif',fontSize:14,fontWeight:700,marginBottom:4}}>Contul meu</div>
+          <div style={{fontSize:12,color:'var(--text3)',marginBottom:14}}>{profile?.nume} · {email}</div>
+          <div style={{fontSize:12,fontWeight:700,color:'var(--text2)',marginBottom:8}}>Schimba parola</div>
+          <input type="password" autoComplete="new-password" placeholder="Parola noua (minim 8 caractere)" value={parola.noua} onChange={e => setParola({...parola, noua: e.target.value})} style={{width:'100%',padding:'11px',border:'1.5px solid var(--border)',borderRadius:10,fontSize:15,fontFamily:'Nunito,sans-serif',outline:'none',marginBottom:10}} />
+          <input type="password" autoComplete="new-password" placeholder="Repeta parola noua" value={parola.confirma} onChange={e => setParola({...parola, confirma: e.target.value})} style={{width:'100%',padding:'11px',border:'1.5px solid var(--border)',borderRadius:10,fontSize:15,fontFamily:'Nunito,sans-serif',outline:'none',marginBottom:10}} />
+          {msgParola.text && <div style={{padding:'10px 12px',borderRadius:10,fontSize:12,fontWeight:600,marginBottom:10,background:msgParola.tip === 'success' ? 'var(--t7)' : '#fee2e2',color:msgParola.tip === 'success' ? 'var(--t1)' : '#b91c1c'}}>{msgParola.text}</div>}
+          <button onClick={schimbaParola} disabled={saving} style={{width:'100%',padding:'12px',background:'linear-gradient(135deg,var(--l3),var(--t2))',border:'none',borderRadius:12,color:'#fff',fontSize:14,fontWeight:800,cursor:'pointer'}}>
+            {saving ? 'Se salveaza...' : 'Salveaza parola noua'}
+          </button>
+        </div>
+
+        {profile?.rol === 'administrator' && <>
         {/* UTILIZATORI */}
         <div style={{background:'#fff',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
           <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:14}}>
@@ -186,6 +214,7 @@ export default function Setari() {
             </div>
           </div>
         </div>
+        </>}
 
       </div>
 

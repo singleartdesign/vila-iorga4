@@ -362,7 +362,7 @@ export default function Citiri() {
                 Poza apometru {esteAdmin ? '(optional)' : ''}
                 {getCitire(modal.id)?.poza_path && !poza && <span style={{color:'var(--t1)',fontSize:10,marginLeft:4}}>· exista deja o poza</span>}
               </label>
-              <input type="file" accept="image/*" capture="environment" onChange={e => setPoza(e.target.files?.[0] || null)}
+              <input type="file" accept="image/*" onChange={e => setPoza(e.target.files?.[0] || null)}
                 style={{width:'100%',padding:'10px',border:'1.5px dashed var(--border)',borderRadius:10,fontSize:13,fontFamily:'Nunito,sans-serif',background:'var(--bg)'}} />
             </div>
 
