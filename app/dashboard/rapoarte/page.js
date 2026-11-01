@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
+import Icon from '@/lib/Icon'
 import { useRouter } from 'next/navigation'
 import { verificaLuna, AlerteLuna, driveUrl, fmt, CULORI_AP } from '@/lib/verificari'
 
@@ -66,7 +67,7 @@ export default function Rapoarte() {
 
   if (loading) return (
     <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:'transparent'}}>
-      <div style={{textAlign:'center'}}><div style={{fontSize:40}}>📋</div><div style={{color:'var(--text3)',fontWeight:600,marginTop:8}}>Se incarca...</div></div>
+      <div style={{textAlign:'center'}}><div style={{display:'flex',justifyContent:'center',color:'var(--t2)'}}><Icon name="rapoarte" size={44} stroke={1.3} /></div><div style={{color:'var(--text3)',fontWeight:600,marginTop:8}}>Se incarca...</div></div>
     </div>
   )
 
@@ -144,9 +145,9 @@ export default function Rapoarte() {
               </div>
             )}
             <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
-              <a className="btn-cta" href={`/dashboard/rapoarte/pdf?luna=${lunaSelectata.id}`} target="_blank" rel="noreferrer" style={{flex:1,minWidth:140,textAlign:'center',padding:'11px',borderRadius:12,background:'var(--btn)',color:'#fff',fontSize:13,fontWeight:600,textDecoration:'none'}}>📄 Raport PDF pentru grup</a>
+              <a className="btn-cta" href={`/dashboard/rapoarte/pdf?luna=${lunaSelectata.id}`} target="_blank" rel="noreferrer" style={{flex:1,minWidth:140,textAlign:'center',padding:'11px',borderRadius:12,background:'var(--btn)',color:'#fff',fontSize:13,fontWeight:600,textDecoration:'none'}}>Raport PDF pentru grup</a>
               {lunaSelectata.drive_folder_id && (
-                <a href={driveUrl(lunaSelectata.drive_folder_id)} target="_blank" rel="noreferrer" style={{flex:1,minWidth:140,textAlign:'center',padding:'11px',borderRadius:12,background:'var(--l7)',border:'1.5px solid var(--l5)',color:'var(--l1)',fontSize:13,fontWeight:600,textDecoration:'none'}}>📁 Poze apometre si aviz</a>
+                <a href={driveUrl(lunaSelectata.drive_folder_id)} target="_blank" rel="noreferrer" style={{flex:1,minWidth:140,textAlign:'center',padding:'11px',borderRadius:12,background:'var(--l7)',border:'1.5px solid var(--l5)',color:'var(--l1)',fontSize:13,fontWeight:600,textDecoration:'none'}}><Icon name="folder" size={16} style={{display:'inline-block',verticalAlign:'-3px',marginRight:6}} />Poze apometre si aviz</a>
               )}
             </div>
           </div>
@@ -227,7 +228,7 @@ export default function Rapoarte() {
       </div>
 
       <div style={{position:'fixed',bottom:0,left:0,right:0,background:'var(--glass)',backdropFilter:'blur(24px)',WebkitBackdropFilter:'blur(24px)',borderTop:'1px solid rgba(255,255,255,0.8)',display:'flex',justifyContent:'space-around',padding:'8px 0 20px',zIndex:100}}>
-        {[{icon:'📊',label:'Dashboard',href:'/dashboard'},{icon:'🔢',label:'Citiri',href:'/dashboard/citiri'},{icon:'💳',label:'Plati',href:'/dashboard/plati'},{icon:'📈',label:'Grafice',href:'/dashboard/grafice'},{icon:'⚙️',label:'Setari',href:'/dashboard/setari'}].map(item => (
+        {[{icon:'dashboard',label:'Dashboard',href:'/dashboard'},{icon:'citiri',label:'Citiri',href:'/dashboard/citiri'},{icon:'plati',label:'Plati',href:'/dashboard/plati'},{icon:'grafice',label:'Grafice',href:'/dashboard/grafice'},{icon:'setari',label:'Setari',href:'/dashboard/setari'}].map(item => (
           <a key={item.href} href={item.href} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:3,textDecoration:'none',minWidth:56}}>
             <span style={{fontSize:20}}>{item.icon}</span>
             <span style={{fontSize:10,fontWeight:500,color:'var(--text3)'}}>{item.label}</span>

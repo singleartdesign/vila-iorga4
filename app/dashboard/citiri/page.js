@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
+import Icon from '@/lib/Icon'
 import { useRouter } from 'next/navigation'
 import { sumaApometreCorectata } from '@/lib/verificari'
 
@@ -152,7 +153,7 @@ export default function Citiri() {
 
   if (loading) return (
     <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:'transparent'}}>
-      <div style={{textAlign:'center'}}><div style={{fontSize:40}}>💧</div><div style={{color:'var(--text3)',fontWeight:600,marginTop:8}}>Se incarca...</div></div>
+      <div style={{textAlign:'center'}}><div style={{display:'flex',justifyContent:'center',color:'var(--t2)'}}><Icon name="picatura" size={44} stroke={1.3} /></div><div style={{color:'var(--text3)',fontWeight:600,marginTop:8}}>Se incarca...</div></div>
     </div>
   )
 
@@ -196,7 +197,7 @@ export default function Citiri() {
 
         {lunaActuala?.validata ? (
           <div style={{padding:'12px 14px',borderRadius:12,background:'var(--l7)',border:'1px solid var(--l5)',color:'var(--l1)',fontSize:12,fontWeight:600}}>
-            🔒 Luna {lunaNume} e validata. Citirile nu mai pot fi modificate de proprietari.
+            <Icon name="lacat" size={16} style={{display:'inline-block',verticalAlign:'-3px',marginRight:6}} />Luna {lunaNume} e validata. Citirile nu mai pot fi modificate de proprietari.
           </div>
         ) : !esteAdmin && (
           <div style={{padding:'12px 14px',borderRadius:12,background:'var(--t7)',border:'1px solid var(--t5)',color:'var(--t1)',fontSize:12,fontWeight:600,lineHeight:1.5}}>
@@ -231,7 +232,7 @@ export default function Citiri() {
                       </div>
                     )}
                     {citire?.poza_path && (
-                      <button onClick={() => deschidePoza(citire.poza_path)} style={{marginTop:4,padding:0,border:'none',background:'none',color:'var(--l2)',fontSize:11,fontWeight:500,cursor:'pointer'}}>📷 Vezi poza</button>
+                      <button onClick={() => deschidePoza(citire.poza_path)} style={{marginTop:4,padding:0,border:'none',background:'none',color:'var(--l2)',fontSize:11,fontWeight:500,cursor:'pointer'}}><Icon name="poza" size={14} style={{display:'inline-block',verticalAlign:'-3px',marginRight:6}} />Vezi poza</button>
                     )}
                     {!hasData && citirePrec && (
                       <div style={{fontSize:10,color:'var(--text3)',marginTop:2}}>
@@ -253,7 +254,7 @@ export default function Citiri() {
                         color:hasData?'var(--text2)':'#fff',
                         fontSize:11,fontWeight:500,cursor:'pointer'
                       }}>
-                        {hasData ? '✏️ Edit' : '+ Adauga'}
+                        {hasData ? <><Icon name="creion" size={14} style={{display:'inline-block',verticalAlign:'-3px',marginRight:6}} />Edit</> : <><Icon name="plus" size={14} style={{display:'inline-block',verticalAlign:'-3px',marginRight:6}} />Adauga</>}
                       </button>
                     )}
                   </div>
@@ -382,9 +383,9 @@ export default function Citiri() {
       )}
 
       <div style={{position:'fixed',bottom:0,left:0,right:0,background:'var(--glass)',backdropFilter:'blur(24px)',WebkitBackdropFilter:'blur(24px)',borderTop:'1px solid rgba(255,255,255,0.8)',display:'flex',justifyContent:'space-around',padding:'8px 0 20px',zIndex:100}}>
-        {[{icon:'📊',label:'Dashboard',href:'/dashboard'},{icon:'🔢',label:'Citiri',href:'/dashboard/citiri'},{icon:'💳',label:'Plati',href:'/dashboard/plati'},{icon:'📈',label:'Grafice',href:'/dashboard/grafice'},{icon:'⚙️',label:'Setari',href:'/dashboard/setari'}].map(item => (
+        {[{icon:'dashboard',label:'Dashboard',href:'/dashboard'},{icon:'citiri',label:'Citiri',href:'/dashboard/citiri'},{icon:'plati',label:'Plati',href:'/dashboard/plati'},{icon:'grafice',label:'Grafice',href:'/dashboard/grafice'},{icon:'setari',label:'Setari',href:'/dashboard/setari'}].map(item => (
           <a key={item.href} href={item.href} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:3,textDecoration:'none',minWidth:56}}>
-            <span style={{fontSize:20}}>{item.icon}</span>
+            <span style={{width:40,height:40,borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',background:item.href==='/dashboard/citiri'?'var(--btn)':'rgba(255,255,255,0.65)',color:item.href==='/dashboard/citiri'?'#fff':'var(--text2)',border:'1px solid rgba(255,255,255,0.8)'}}><Icon name={item.icon} size={19} /></span>
             <span style={{fontSize:10,fontWeight:500,color:item.href==='/dashboard/citiri'?'var(--t1)':'var(--text3)'}}>{item.label}</span>
           </a>
         ))}

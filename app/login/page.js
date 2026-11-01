@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase'
+import Icon from '@/lib/Icon'
 import { useRouter } from 'next/navigation'
 
 export default function LoginPage() {
@@ -36,18 +37,18 @@ export default function LoginPage() {
       <div style={{ position: 'relative', width: '100%', maxWidth: 420, borderRadius: 36, padding: '34px 30px 28px', background: 'rgba(240,247,249,0.5)', backdropFilter: 'blur(30px) saturate(160%)', WebkitBackdropFilter: 'blur(30px) saturate(160%)', border: '1px solid rgba(255,255,255,0.75)', boxShadow: '0 30px 80px rgba(11,37,69,0.18)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 44 }}>
           <div style={{ fontSize: 18, color: '#5b6b78', fontWeight: 400 }}>Vila Iorga 4</div>
-          <div style={{ fontSize: 18, color: '#0b2545', fontWeight: 400 }}>Apă 💧</div>
+          <div style={{ fontSize: 18, color: '#0b2545', fontWeight: 400, display: 'flex', alignItems: 'center', gap: 6 }}>Apă <Icon name="picatura" size={20} style={{ color: '#1a9fb0' }} /></div>
         </div>
 
         <div style={{ fontSize: 40, fontWeight: 400, color: '#0b2545', letterSpacing: '-0.02em', marginBottom: 26 }}>Intră în cont</div>
 
         <form onSubmit={handleLogin}>
           <div style={pill}>
-            <div style={icon}>@</div>
+            <div style={icon}><Icon name="arond" size={18} /></div>
             <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="adresa de email" required autoComplete="email" style={input} />
           </div>
           <div style={pill}>
-            <div style={icon}>🔑</div>
+            <div style={icon}><Icon name="cheie" size={18} /></div>
             <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="parola" required autoComplete="current-password" style={input} />
             <a href="mailto:office@single.art?subject=Parola%20Iorga%204" style={{ padding: '9px 16px', borderRadius: 999, background: '#fff', color: '#0b2545', fontSize: 13, textDecoration: 'none', whiteSpace: 'nowrap' }}>Am uitat</a>
           </div>

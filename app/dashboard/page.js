@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase'
+import Icon from '@/lib/Icon'
 import { useRouter } from 'next/navigation'
 import { sumaApometreCorectata } from '@/lib/verificari'
 
@@ -169,7 +170,7 @@ export default function Dashboard() {
 
   if (loading) return (
     <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:'transparent',fontFamily:'var(--font)'}}>
-      <div style={{textAlign:'center'}}><div style={{fontSize:48}}>💧</div><div style={{color:'var(--text3)',fontWeight:600,marginTop:8}}>Se incarca...</div></div>
+      <div style={{textAlign:'center'}}><div style={{display:'flex',justifyContent:'center',color:'var(--t2)'}}><Icon name="picatura" size={44} stroke={1.3} /></div><div style={{color:'var(--text3)',fontWeight:600,marginTop:8}}>Se incarca...</div></div>
     </div>
   )
 
@@ -187,7 +188,7 @@ export default function Dashboard() {
 
       <div style={{background:'var(--hdr)',padding:'14px 20px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
         <div style={{display:'flex',alignItems:'center',gap:10}}>
-          <span style={{fontSize:22}}>💧</span>
+          <Icon name="picatura" size={26} stroke={1.5} style={{color:'#8fdde0'}} />
           <div>
             <div style={{color:'#fff',fontWeight:600,fontSize:16,fontFamily:'var(--font-display)'}}>Vila Iorga 4</div>
             <div style={{color:'rgba(255,255,255,0.7)',fontSize:11}}>Administrare apa</div>
@@ -204,19 +205,19 @@ export default function Dashboard() {
 
       <div style={{background:'rgba(250,246,242,0.55)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderBottom:'1px solid rgba(255,255,255,0.7)',display:'flex',overflowX:'auto',padding:'0 10px'}}>
         {[
-          {label:'Dashboard',icon:'📊',href:'/dashboard'},
-          {label:'Citiri',icon:'🔢',href:'/dashboard/citiri'},
-          {label:'Facturi',icon:'📄',href:'/dashboard/facturi'},
-          {label:'Plati',icon:'💳',href:'/dashboard/plati'},
-          {label:'Rapoarte',icon:'📋',href:'/dashboard/rapoarte'},
-          {label:'Setari',icon:'⚙️',href:'/dashboard/setari'},
+          {label:'Dashboard',icon:'dashboard',href:'/dashboard'},
+          {label:'Citiri',icon:'citiri',href:'/dashboard/citiri'},
+          {label:'Facturi',icon:'facturi',href:'/dashboard/facturi'},
+          {label:'Plati',icon:'plati',href:'/dashboard/plati'},
+          {label:'Rapoarte',icon:'rapoarte',href:'/dashboard/rapoarte'},
+          {label:'Setari',icon:'setari',href:'/dashboard/setari'},
         ].map(tab => (
           <a key={tab.href} href={tab.href} style={{
             display:'flex',alignItems:'center',gap:5,padding:'11px 14px',fontSize:12,fontWeight:500,
             color:tab.href==='/dashboard'?'var(--t1)':'var(--text3)',
             borderBottom:tab.href==='/dashboard'?'2.5px solid var(--t1)':'2.5px solid transparent',
             textDecoration:'none',whiteSpace:'nowrap'
-          }}>{tab.icon} {tab.label}</a>
+          }}><Icon name={tab.icon} size={16} /> {tab.label}</a>
         ))}
       </div>
 
@@ -319,14 +320,14 @@ export default function Dashboard() {
 
       <div style={{position:'fixed',bottom:0,left:0,right:0,background:'var(--glass)',backdropFilter:'blur(24px)',WebkitBackdropFilter:'blur(24px)',borderTop:'1px solid rgba(255,255,255,0.8)',display:'flex',justifyContent:'space-around',padding:'8px 0 20px',zIndex:100,boxShadow:'0 -4px 20px rgba(0,0,0,0.06)'}}>
         {[
-          {icon:'📊',label:'Dashboard',href:'/dashboard'},
-          {icon:'🔢',label:'Citiri',href:'/dashboard/citiri'},
-          {icon:'💳',label:'Plati',href:'/dashboard/plati'},
-          {icon:'📈',label:'Grafice',href:'/dashboard/grafice'},
-          {icon:'⚙️',label:'Setari',href:'/dashboard/setari'},
+          {icon:'dashboard',label:'Dashboard',href:'/dashboard'},
+          {icon:'citiri',label:'Citiri',href:'/dashboard/citiri'},
+          {icon:'plati',label:'Plati',href:'/dashboard/plati'},
+          {icon:'grafice',label:'Grafice',href:'/dashboard/grafice'},
+          {icon:'setari',label:'Setari',href:'/dashboard/setari'},
         ].map(item => (
           <a key={item.href} href={item.href} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:3,textDecoration:'none',minWidth:56}}>
-            <span style={{fontSize:20}}>{item.icon}</span>
+            <span style={{width:40,height:40,borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',background:item.href==='/dashboard'?'var(--btn)':'rgba(255,255,255,0.65)',color:item.href==='/dashboard'?'#fff':'var(--text2)',border:'1px solid rgba(255,255,255,0.8)'}}><Icon name={item.icon} size={19} /></span>
             <span style={{fontSize:10,fontWeight:500,color:item.href==='/dashboard'?'var(--t1)':'var(--text3)'}}>{item.label}</span>
           </a>
         ))}

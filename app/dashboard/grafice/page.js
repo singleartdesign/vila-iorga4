@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
+import Icon from '@/lib/Icon'
 import { useRouter } from 'next/navigation'
 
 const LUNI_NUME = ['','Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Nov','Dec']
@@ -27,7 +28,7 @@ export default function Grafice() {
 
   if (loading) return (
     <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:'transparent'}}>
-      <div style={{textAlign:'center'}}><div style={{fontSize:40}}>📈</div><div style={{color:'var(--text3)',fontWeight:600,marginTop:8}}>Se incarca...</div></div>
+      <div style={{textAlign:'center'}}><div style={{display:'flex',justifyContent:'center',color:'var(--t2)'}}><Icon name="grafice" size={44} stroke={1.3} /></div><div style={{color:'var(--text3)',fontWeight:600,marginTop:8}}>Se incarca...</div></div>
     </div>
   )
 
@@ -175,9 +176,9 @@ export default function Grafice() {
       </div>
 
       <div style={{position:'fixed', bottom:0, left:0, right:0, background:'var(--glass)', backdropFilter:'blur(24px)', WebkitBackdropFilter:'blur(24px)', borderTop:'1px solid rgba(255,255,255,0.8)', display:'flex', justifyContent:'space-around', padding:'8px 0 20px', zIndex:100}}>
-        {[{icon:'📊',label:'Dashboard',href:'/dashboard'},{icon:'🔢',label:'Citiri',href:'/dashboard/citiri'},{icon:'💳',label:'Plati',href:'/dashboard/plati'},{icon:'📈',label:'Grafice',href:'/dashboard/grafice'},{icon:'⚙️',label:'Setari',href:'/dashboard/setari'}].map(item => (
+        {[{icon:'dashboard',label:'Dashboard',href:'/dashboard'},{icon:'citiri',label:'Citiri',href:'/dashboard/citiri'},{icon:'plati',label:'Plati',href:'/dashboard/plati'},{icon:'grafice',label:'Grafice',href:'/dashboard/grafice'},{icon:'setari',label:'Setari',href:'/dashboard/setari'}].map(item => (
           <a key={item.href} href={item.href} style={{display:'flex', flexDirection:'column', alignItems:'center', gap:3, textDecoration:'none', minWidth:56}}>
-            <span style={{fontSize:20}}>{item.icon}</span>
+            <span style={{width:40,height:40,borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',background:item.href==='/dashboard/grafice'?'var(--btn)':'rgba(255,255,255,0.65)',color:item.href==='/dashboard/grafice'?'#fff':'var(--text2)',border:'1px solid rgba(255,255,255,0.8)'}}><Icon name={item.icon} size={19} /></span>
             <span style={{fontSize:10, fontWeight:500, color:item.href==='/dashboard/grafice'?'var(--t1)':'var(--text3)'}}>{item.label}</span>
           </a>
         ))}

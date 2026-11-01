@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
+import Icon from '@/lib/Icon'
 import { useRouter } from 'next/navigation'
 import { verificaLuna, AlerteLuna, driveUrl, fmt } from '@/lib/verificari'
 
@@ -111,7 +112,7 @@ export default function Facturi() {
 
   if (loading) return (
     <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:'transparent'}}>
-      <div style={{textAlign:'center'}}><div style={{fontSize:40}}>📄</div><div style={{color:'var(--text3)',fontWeight:600,marginTop:8}}>Se incarca...</div></div>
+      <div style={{textAlign:'center'}}><div style={{display:'flex',justifyContent:'center',color:'var(--t2)'}}><Icon name="facturi" size={44} stroke={1.3} /></div><div style={{color:'var(--text3)',fontWeight:600,marginTop:8}}>Se incarca...</div></div>
     </div>
   )
 
@@ -208,7 +209,7 @@ export default function Facturi() {
               <label style={labelStil}>Folder Drive cu poze si aviz (ID sau link)</label>
               <div style={{display:'flex',gap:8}}>
                 <input value={form.drive_folder_id} onChange={e => { const v = e.target.value; const m = v.match(/folders\/([\w-]+)/); setForm({...form, drive_folder_id: m ? m[1] : v}) }} style={{...inputStil,flex:1,fontSize:12}} placeholder="lipeste linkul folderului din Drive" />
-                {form.drive_folder_id && <a href={driveUrl(form.drive_folder_id)} target="_blank" rel="noreferrer" style={{padding:'10px 12px',borderRadius:10,background:'var(--l7)',color:'var(--l1)',fontSize:12,fontWeight:500,textDecoration:'none',whiteSpace:'nowrap'}}>📁 Deschide</a>}
+                {form.drive_folder_id && <a href={driveUrl(form.drive_folder_id)} target="_blank" rel="noreferrer" style={{padding:'10px 12px',borderRadius:10,background:'var(--l7)',color:'var(--l1)',fontSize:12,fontWeight:500,textDecoration:'none',whiteSpace:'nowrap'}}><Icon name="folder" size={14} style={{display:'inline-block',verticalAlign:'-3px',marginRight:6}} />Deschide</a>}
               </div>
             </div>
 
@@ -262,7 +263,7 @@ export default function Facturi() {
               const { error } = await supabase.from('luni_facturare').update({ validata: v, validata_la: v ? new Date().toISOString() : null }).eq('id', lunaActuala.id)
               if (error) { setMsg('Eroare: ' + error.message); setMsgType('error') } else { setMsg(v ? 'Luna validata: citirile sunt blocate pentru proprietari.' : 'Luna deblocata: proprietarii pot corecta citirile.'); setMsgType('success'); await loadData() }
             }} style={{width:'100%',padding:'11px',marginBottom:10,background:lunaActuala.validata ? 'var(--l7)' : 'var(--glass)',border:`1.5px solid ${lunaActuala.validata ? 'var(--l4)' : 'var(--border)'}`,borderRadius:12,color:'var(--l1)',fontSize:13,fontWeight:500,cursor:'pointer'}}>
-              {lunaActuala.validata ? '🔒 Luna validata (apasa ca sa deblochezi citirile)' : '🔓 Valideaza luna (blocheaza citirile proprietarilor)'}
+              {lunaActuala.validata ? <><Icon name="lacat" size={16} style={{display:'inline-block',verticalAlign:'-3px',marginRight:6}} />Luna validata (apasa ca sa deblochezi citirile)</> : <><Icon name="deschis" size={16} style={{display:'inline-block',verticalAlign:'-3px',marginRight:6}} />Valideaza luna (blocheaza citirile proprietarilor)</>}
             </button>
 
             <button onClick={async () => {
@@ -278,7 +279,7 @@ export default function Facturi() {
               }
               setMsg(ok === cuPoza.length ? `Gata: ${ok} poze salvate in Drive.` : `${ok} din ${cuPoza.length} poze salvate. Eroare: ${err}`); setMsgType(ok === cuPoza.length ? 'success' : 'error'); await loadData()
             }} style={{width:'100%',padding:'11px',marginBottom:10,background:'var(--glass)',border:'1.5px solid var(--border)',borderRadius:12,color:'var(--text2)',fontSize:13,fontWeight:500,cursor:'pointer'}}>
-              📁 Trimite pozele lunii in Drive
+              <Icon name="folder" size={16} style={{display:'inline-block',verticalAlign:'-3px',marginRight:6}} />Trimite pozele lunii in Drive
             </button>
 
             <button className="btn-cta" onClick={salveazaFactura} disabled={saving} style={{
@@ -319,7 +320,7 @@ export default function Facturi() {
       </div>
 
       <div style={{position:'fixed',bottom:0,left:0,right:0,background:'var(--glass)',backdropFilter:'blur(24px)',WebkitBackdropFilter:'blur(24px)',borderTop:'1px solid rgba(255,255,255,0.8)',display:'flex',justifyContent:'space-around',padding:'8px 0 20px',zIndex:100}}>
-        {[{icon:'📊',label:'Dashboard',href:'/dashboard'},{icon:'🔢',label:'Citiri',href:'/dashboard/citiri'},{icon:'💳',label:'Plati',href:'/dashboard/plati'},{icon:'📈',label:'Grafice',href:'/dashboard/grafice'},{icon:'⚙️',label:'Setari',href:'/dashboard/setari'}].map(item => (
+        {[{icon:'dashboard',label:'Dashboard',href:'/dashboard'},{icon:'citiri',label:'Citiri',href:'/dashboard/citiri'},{icon:'plati',label:'Plati',href:'/dashboard/plati'},{icon:'grafice',label:'Grafice',href:'/dashboard/grafice'},{icon:'setari',label:'Setari',href:'/dashboard/setari'}].map(item => (
           <a key={item.href} href={item.href} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:3,textDecoration:'none',minWidth:56}}>
             <span style={{fontSize:20}}>{item.icon}</span>
             <span style={{fontSize:10,fontWeight:500,color:'var(--text3)'}}>{item.label}</span>

@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
+import Icon from '@/lib/Icon'
 import { useRouter } from 'next/navigation'
 
 const LUNI_NUME = ['','Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Nov','Dec']
@@ -87,7 +88,7 @@ export default function Plati() {
 
   if (loading) return (
     <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:'transparent'}}>
-      <div style={{textAlign:'center'}}><div style={{fontSize:40}}>💧</div><div style={{color:'var(--text3)',fontWeight:600,marginTop:8}}>Se incarca...</div></div>
+      <div style={{textAlign:'center'}}><div style={{display:'flex',justifyContent:'center',color:'var(--t2)'}}><Icon name="picatura" size={44} stroke={1.3} /></div><div style={{color:'var(--text3)',fontWeight:600,marginTop:8}}>Se incarca...</div></div>
     </div>
   )
 
@@ -201,7 +202,7 @@ export default function Plati() {
                       color:status==='platit'?'var(--text2)':'#fff',
                       fontSize:12,fontWeight:500,cursor:'pointer'
                     }}>
-                      {status==='platit'?'✏️ Modifica plata':'💳 Inregistreaza plata'}
+                      {status==='platit'?<><Icon name="creion" size={14} style={{display:'inline-block',verticalAlign:'-3px',marginRight:6}} />Modifica plata</>:<><Icon name="plati" size={14} style={{display:'inline-block',verticalAlign:'-3px',marginRight:6}} />Inregistreaza plata</>}
                     </button>
                   )}
                 </div>
@@ -255,7 +256,7 @@ export default function Plati() {
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
               <button onClick={() => setModal(null)} style={{padding:13,background:'var(--bg)',border:'none',borderRadius:12,fontSize:13,fontWeight:500,cursor:'pointer'}}>Anuleaza</button>
               <button className="btn-cta" onClick={savePlata} disabled={saving} style={{padding:13,background:'var(--btn)',border:'none',borderRadius:12,color:'#fff',fontSize:13,fontWeight:500,cursor:'pointer'}}>
-                {saving?'Se salveaza...':'✅ Confirma plata'}
+                {saving?'Se salveaza...':'Confirma plata'}
               </button>
             </div>
           </div>
@@ -263,9 +264,9 @@ export default function Plati() {
       )}
 
       <div style={{position:'fixed',bottom:0,left:0,right:0,background:'var(--glass)',backdropFilter:'blur(24px)',WebkitBackdropFilter:'blur(24px)',borderTop:'1px solid rgba(255,255,255,0.8)',display:'flex',justifyContent:'space-around',padding:'8px 0 20px',zIndex:100}}>
-        {[{icon:'📊',label:'Dashboard',href:'/dashboard'},{icon:'🔢',label:'Citiri',href:'/dashboard/citiri'},{icon:'💳',label:'Plati',href:'/dashboard/plati'},{icon:'📈',label:'Grafice',href:'/dashboard/grafice'},{icon:'⚙️',label:'Setari',href:'/dashboard/setari'}].map(item => (
+        {[{icon:'dashboard',label:'Dashboard',href:'/dashboard'},{icon:'citiri',label:'Citiri',href:'/dashboard/citiri'},{icon:'plati',label:'Plati',href:'/dashboard/plati'},{icon:'grafice',label:'Grafice',href:'/dashboard/grafice'},{icon:'setari',label:'Setari',href:'/dashboard/setari'}].map(item => (
           <a key={item.href} href={item.href} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:3,textDecoration:'none',minWidth:56}}>
-            <span style={{fontSize:20}}>{item.icon}</span>
+            <span style={{width:40,height:40,borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',background:item.href==='/dashboard/plati'?'var(--btn)':'rgba(255,255,255,0.65)',color:item.href==='/dashboard/plati'?'#fff':'var(--text2)',border:'1px solid rgba(255,255,255,0.8)'}}><Icon name={item.icon} size={19} /></span>
             <span style={{fontSize:10,fontWeight:500,color:item.href==='/dashboard/plati'?'var(--t1)':'var(--text3)'}}>{item.label}</span>
           </a>
         ))}
