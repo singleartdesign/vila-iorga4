@@ -9,7 +9,7 @@ const INK = '#1f2a33', GREY = '#6b7780', T1 = '#0f8b8d', LINE = '#d5dde2'
 
 export default function Pagina() {
   return (
-    <Suspense fallback={<div style={{ padding: 40, fontFamily: 'Nunito,sans-serif' }}>Se incarca...</div>}>
+    <Suspense fallback={<div style={{ padding: 40, fontFamily: 'var(--font)' }}>Se incarca...</div>}>
       <RaportPdf />
     </Suspense>
   )
@@ -53,7 +53,7 @@ function RaportPdf() {
   }
 
   if (eroare) return <div style={{ padding: 40 }}>{eroare}</div>
-  if (!date) return <div style={{ padding: 40, fontFamily: 'Nunito,sans-serif' }}>Se incarca...</div>
+  if (!date) return <div style={{ padding: 40, fontFamily: 'var(--font)' }}>Se incarca...</div>
 
   const { luna, randuri, ultimele, ist } = date
   const val = Number(luna.valoare_factura) || 0
@@ -89,12 +89,12 @@ function RaportPdf() {
 
       <div className="bara">
         <button onClick={() => window.print()} style={{ background: T1, color: '#fff' }}>⬇ Salveaza ca PDF / Printeaza</button>
-        <a href="/dashboard/rapoarte" style={{ background: '#fff', color: INK }}>← Inapoi</a>
+        <a href="/dashboard/rapoarte" style={{ background: 'var(--glass)', color: INK }}>← Inapoi</a>
       </div>
 
-      <div style={{ background: T1, color: '#fff', padding: '26px 14mm 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div style={{ background: T1, color: 'var(--glass)', padding: '26px 14mm 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <div style={{ fontFamily: 'Sora,sans-serif', fontSize: 24, fontWeight: 700 }}>Vila Iorga 4 · Apă rece</div>
+          <div style={{ fontFamily: 'var(--font)', fontSize: 24, fontWeight: 700 }}>Vila Iorga 4 · Apă rece</div>
           <div style={{ fontSize: 14, marginTop: 4 }}>Consum {numeLuna} · citiri apometre din 24 {LUNI[luna.luna - 1]}</div>
         </div>
         <div style={{ textAlign: 'right', fontSize: 11, lineHeight: 1.5 }}>Str. Nicolae Iorga nr. 4, Brașov<br />Administrator: Vlad Ștefan</div>
@@ -115,7 +115,7 @@ function RaportPdf() {
           ))}
         </div>
 
-        <div style={{ fontFamily: 'Sora,sans-serif', fontWeight: 700, fontSize: 14, margin: '20px 0 8px' }}>De plată pe apartament</div>
+        <div style={{ fontFamily: 'var(--font)', fontWeight: 700, fontSize: 14, margin: '20px 0 8px' }}>De plată pe apartament</div>
         <table>
           <thead><tr>
             <th>Ap.</th><th>Proprietar</th><th>Index vechi</th><th>Index nou</th><th>Consum</th><th>Ajustare*</th><th>mc de plată</th><th>{areSold ? 'Luna aceasta' : 'De plată'}</th>
@@ -175,9 +175,9 @@ function RaportPdf() {
           {Math.abs(dif) > Math.max(2, mc * 0.1) && <><br /><strong style={{ color: '#a85a12' }}>Diferență mare luna aceasta: verific citirile și apometrele.</strong></>}
         </div>
 
-        <div style={{ fontFamily: 'Sora,sans-serif', fontWeight: 700, fontSize: 14, margin: '14px 0 2px' }}>Consum pe apartament, ultimele 12 luni (mc)</div>
+        <div style={{ fontFamily: 'var(--font)', fontWeight: 700, fontSize: 14, margin: '14px 0 2px' }}>Consum pe apartament, ultimele 12 luni (mc)</div>
         <GraficApartamente ultimele={ultimele} ist={ist} apartamente={apartamente} />
-        <div style={{ fontFamily: 'Sora,sans-serif', fontWeight: 700, fontSize: 12, margin: '6px 0 2px' }}>Total clădire: apometre vs contor general (mc)</div>
+        <div style={{ fontFamily: 'var(--font)', fontWeight: 700, fontSize: 12, margin: '6px 0 2px' }}>Total clădire: apometre vs contor general (mc)</div>
         <GraficTotal ultimele={ultimele} ist={ist} apartamente={apartamente} />
 
         <div style={{ marginTop: 8, fontSize: 11, lineHeight: 1.5 }}>
@@ -229,7 +229,7 @@ function GraficApartamente({ ultimele, ist, apartamente }) {
   const y = v => pt + (H - pt - pb) * (1 - v / top)
   const bw = Math.min(8, (gw - 8) / Math.max(1, apartamente.length))
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 'auto' }} fontFamily="Nunito,sans-serif">
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 'auto' }} fontFamily="Urbanist, system-ui, sans-serif">
       <Axe W={W} H={H} pl={pl} pb={pb} top={top} pas={pas} y={y} ultimele={ultimele} gw={gw} />
       {ultimele.map((l, i) => apartamente.map((a, k) => {
         const v = valoare(ist, l.id, a)
@@ -258,7 +258,7 @@ function GraficTotal({ ultimele, ist, apartamente }) {
   const y = v => pt + (H - pt - pb) * (1 - v / top)
   const lat = Math.min(14, gw / 3)
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 'auto' }} fontFamily="Nunito,sans-serif">
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 'auto' }} fontFamily="Urbanist, system-ui, sans-serif">
       <Axe W={W} H={H} pl={pl} pb={pb} top={top} pas={pas} y={y} ultimele={ultimele} gw={gw} />
       {ultimele.map((l, i) => {
         const cx = pl + gw * i + gw / 2, s = suma(l), g = Number(l.consum_facturat) || 0, d = g - s

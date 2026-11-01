@@ -151,13 +151,13 @@ export default function Citiri() {
   const pierdere = lunaActuala ? lunaActuala.consum_facturat - totalConsum : 0
 
   if (loading) return (
-    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:'var(--bg)'}}>
+    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:'transparent'}}>
       <div style={{textAlign:'center'}}><div style={{fontSize:40}}>💧</div><div style={{color:'var(--text3)',fontWeight:600,marginTop:8}}>Se incarca...</div></div>
     </div>
   )
 
   return (
-    <div style={{minHeight:'100vh',background:'var(--bg)',fontFamily:'var(--font)',paddingBottom:80}}>
+    <div style={{minHeight:'100vh',background:'transparent',fontFamily:'var(--font)',paddingBottom:80}}>
 
       <div style={{background:'var(--hdr)',padding:'14px 20px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
         <div style={{display:'flex',alignItems:'center',gap:10}}>
@@ -243,7 +243,7 @@ export default function Citiri() {
                     {hasData ? (
                       <span style={{fontSize:10,fontWeight:700,color:'var(--t1)',background:'var(--t6)',padding:'2px 8px',borderRadius:12}}>✓ OK</span>
                     ) : (
-                      <span style={{fontSize:10,fontWeight:700,color:'#f97316',background:'#fff7ed',padding:'2px 8px',borderRadius:12}}>Lipsa</span>
+                      <span style={{fontSize:10,fontWeight:700,color:'#f97316',background:'var(--warn-bg)',padding:'2px 8px',borderRadius:12}}>Lipsa</span>
                     )}
                     {editable && (
                       <button onClick={() => openModal(apt)} style={{
@@ -267,7 +267,7 @@ export default function Citiri() {
 
       {modal && (
         <div onClick={() => setModal(null)} style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.45)',zIndex:200,display:'flex',alignItems:'flex-end',justifyContent:'center'}}>
-          <div onClick={e => e.stopPropagation()} style={{background:'#f8f3ee',borderRadius:'32px 32px 0 0',padding:'24px 20px 36px',width:'100%',maxWidth:500,boxShadow:'0 -8px 32px rgba(0,0,0,0.12)'}}>
+          <div onClick={e => e.stopPropagation()} style={{background:'var(--sheet)',borderRadius:'32px 32px 0 0',padding:'24px 20px 36px',width:'100%',maxWidth:500,boxShadow:'0 -8px 32px rgba(0,0,0,0.12)'}}>
             <div style={{width:36,height:4,background:'var(--border)',borderRadius:2,margin:'0 auto 20px'}}></div>
             <div style={{fontFamily:'var(--font-display)',fontSize:17,fontWeight:700,marginBottom:4}}>Citire contor</div>
             <div style={{fontSize:13,color:'var(--text3)',marginBottom:16}}>{modal.proprietar_nume} · Ap. {modal.numar}</div>
@@ -287,14 +287,14 @@ export default function Citiri() {
             {formData.contor_nou ? (
               /* MOD CONTOR NOU */
               <div style={{display:'flex',flexDirection:'column',gap:12,marginBottom:12}}>
-                <div style={{padding:'10px 14px',background:'#fff7ed',borderRadius:10,border:'1px solid #fed7aa',fontSize:12,color:'#b45309'}}>
+                <div style={{padding:'10px 14px',background:'var(--warn-bg)',borderRadius:10,border:'1px solid #fed7aa',fontSize:12,color:'#b45309'}}>
                   Contorul vechi s-a oprit. Introdu indexul final al celui vechi si indexul initial si cel curent al celui nou.
                 </div>
                 <div>
                   <label style={{display:'block',fontSize:12,fontWeight:600,color:'var(--text2)',marginBottom:5}}>Index final contor VECHI (unde s-a oprit)</label>
                   <input type="number" step="0.001" value={formData.index_final_vechi}
                     onChange={e => setFormData({...formData, index_final_vechi: e.target.value})}
-                    style={{width:'100%',padding:'11px',border:'1px solid rgba(29,28,27,0.08)',background:'rgba(255,255,255,0.7)',borderRadius:16,fontSize:15,fontFamily:'var(--font)',outline:'none'}}
+                    style={{width:'100%',padding:'11px',border:'1px solid rgba(29,28,27,0.08)',background:'var(--glass)',borderRadius:16,fontSize:15,fontFamily:'var(--font)',outline:'none'}}
                     placeholder="ex: 162.300"
                   />
                 </div>
@@ -302,7 +302,7 @@ export default function Citiri() {
                   <label style={{display:'block',fontSize:12,fontWeight:600,color:'var(--text2)',marginBottom:5}}>Index start contor NOU (de obicei 0)</label>
                   <input type="number" step="0.001" value={formData.index_start_nou}
                     onChange={e => setFormData({...formData, index_start_nou: e.target.value})}
-                    style={{width:'100%',padding:'11px',border:'1px solid rgba(29,28,27,0.08)',background:'rgba(255,255,255,0.7)',borderRadius:16,fontSize:15,fontFamily:'var(--font)',outline:'none'}}
+                    style={{width:'100%',padding:'11px',border:'1px solid rgba(29,28,27,0.08)',background:'var(--glass)',borderRadius:16,fontSize:15,fontFamily:'var(--font)',outline:'none'}}
                     placeholder="0.000"
                   />
                 </div>
@@ -310,7 +310,7 @@ export default function Citiri() {
                   <label style={{display:'block',fontSize:12,fontWeight:600,color:'var(--text2)',marginBottom:5}}>Index curent contor NOU (citirea de azi)</label>
                   <input type="number" step="0.001" value={formData.index_nou}
                     onChange={e => setFormData({...formData, index_nou: e.target.value})}
-                    style={{width:'100%',padding:'11px',border:'1px solid rgba(29,28,27,0.08)',background:'rgba(255,255,255,0.7)',borderRadius:16,fontSize:15,fontFamily:'var(--font)',outline:'none'}}
+                    style={{width:'100%',padding:'11px',border:'1px solid rgba(29,28,27,0.08)',background:'var(--glass)',borderRadius:16,fontSize:15,fontFamily:'var(--font)',outline:'none'}}
                     placeholder="0.330"
                   />
                 </div>
@@ -335,7 +335,7 @@ export default function Citiri() {
                     <input type="number" step="0.001" value={formData.index_vechi}
                       readOnly={!esteAdmin && !!getCitirePrecedenta(modal.id)}
                       onChange={e => setFormData({...formData, index_vechi: e.target.value})}
-                      style={{width:'100%',padding:'11px',border:'1px solid rgba(29,28,27,0.08)',background:'rgba(255,255,255,0.7)',borderRadius:16,fontSize:15,fontFamily:'var(--font)',outline:'none',background:getCitirePrecedenta(modal.id)?'var(--t7)':'#fff'}}
+                      style={{width:'100%',padding:'11px',border:'1px solid rgba(29,28,27,0.08)',background:'var(--glass)',borderRadius:16,fontSize:15,fontFamily:'var(--font)',outline:'none',background:getCitirePrecedenta(modal.id)?'var(--t7)':'#fff'}}
                       placeholder="0.000"
                     />
                   </div>
@@ -343,7 +343,7 @@ export default function Citiri() {
                     <label style={{display:'block',fontSize:12,fontWeight:600,color:'var(--text2)',marginBottom:5}}>Index nou (mc)</label>
                     <input type="number" step="0.001" value={formData.index_nou}
                       onChange={e => setFormData({...formData, index_nou: e.target.value})}
-                      style={{width:'100%',padding:'11px',border:'1px solid rgba(29,28,27,0.08)',background:'rgba(255,255,255,0.7)',borderRadius:16,fontSize:15,fontFamily:'var(--font)',outline:'none'}}
+                      style={{width:'100%',padding:'11px',border:'1px solid rgba(29,28,27,0.08)',background:'var(--glass)',borderRadius:16,fontSize:15,fontFamily:'var(--font)',outline:'none'}}
                       placeholder="0.000"
                       autoFocus
                     />
@@ -369,7 +369,7 @@ export default function Citiri() {
                 style={{width:'100%',padding:'10px',border:'1.5px dashed var(--border)',borderRadius:10,fontSize:13,fontFamily:'var(--font)',background:'var(--bg)'}} />
             </div>
 
-            {msg && <div style={{padding:'10px',background:'#fee2e2',borderRadius:10,color:'#b91c1c',fontSize:13,marginBottom:12}}>{msg}</div>}
+            {msg && <div style={{padding:'10px',background:'var(--err-bg)',borderRadius:10,color:'#b91c1c',fontSize:13,marginBottom:12}}>{msg}</div>}
 
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
               <button onClick={() => setModal(null)} style={{padding:13,background:'var(--bg)',border:'none',borderRadius:12,fontSize:13,fontWeight:700,cursor:'pointer',color:'var(--text2)'}}>Anuleaza</button>
@@ -381,7 +381,7 @@ export default function Citiri() {
         </div>
       )}
 
-      <div style={{position:'fixed',bottom:0,left:0,right:0,background:'rgba(250,246,242,0.72)',backdropFilter:'blur(24px)',WebkitBackdropFilter:'blur(24px)',borderTop:'1px solid rgba(255,255,255,0.8)',display:'flex',justifyContent:'space-around',padding:'8px 0 20px',zIndex:100}}>
+      <div style={{position:'fixed',bottom:0,left:0,right:0,background:'var(--glass)',backdropFilter:'blur(24px)',WebkitBackdropFilter:'blur(24px)',borderTop:'1px solid rgba(255,255,255,0.8)',display:'flex',justifyContent:'space-around',padding:'8px 0 20px',zIndex:100}}>
         {[{icon:'📊',label:'Dashboard',href:'/dashboard'},{icon:'🔢',label:'Citiri',href:'/dashboard/citiri'},{icon:'💳',label:'Plati',href:'/dashboard/plati'},{icon:'📈',label:'Grafice',href:'/dashboard/grafice'},{icon:'⚙️',label:'Setari',href:'/dashboard/setari'}].map(item => (
           <a key={item.href} href={item.href} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:3,textDecoration:'none',minWidth:56}}>
             <span style={{fontSize:20}}>{item.icon}</span>

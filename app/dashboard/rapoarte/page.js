@@ -65,13 +65,13 @@ export default function Rapoarte() {
   const lunaNume = lunaSelectata ? `${LUNI_NUME[lunaSelectata.luna]} ${lunaSelectata.an}` : ''
 
   if (loading) return (
-    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:'var(--bg)'}}>
+    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:'transparent'}}>
       <div style={{textAlign:'center'}}><div style={{fontSize:40}}>📋</div><div style={{color:'var(--text3)',fontWeight:600,marginTop:8}}>Se incarca...</div></div>
     </div>
   )
 
   return (
-    <div style={{minHeight:'100vh',background:'var(--bg)',fontFamily:'var(--font)',paddingBottom:80}}>
+    <div style={{minHeight:'100vh',background:'transparent',fontFamily:'var(--font)',paddingBottom:80}}>
 
       <div style={{background:'var(--hdr)',padding:'14px 20px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
         <div style={{display:'flex',alignItems:'center',gap:10}}>
@@ -108,19 +108,19 @@ export default function Rapoarte() {
           <div style={{background:'linear-gradient(135deg,var(--t7),var(--l7))',borderRadius:'var(--r)',padding:'14px 16px',border:'1.5px solid var(--t5)'}}>
             <div style={{fontFamily:'var(--font-display)',fontSize:14,fontWeight:700,marginBottom:10}}>Raport {lunaNume}</div>
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
-              <div style={{padding:'10px',background:'rgba(255,255,255,0.72)',borderRadius:10,textAlign:'center'}}>
+              <div style={{padding:'10px',background:'var(--glass)',borderRadius:10,textAlign:'center'}}>
                 <div style={{fontSize:10,color:'var(--text3)',marginBottom:3}}>Consum facturat</div>
                 <div style={{fontSize:17,fontWeight:800,color:'var(--t1)'}}>{lunaSelectata.consum_facturat} mc</div>
               </div>
-              <div style={{padding:'10px',background:'rgba(255,255,255,0.72)',borderRadius:10,textAlign:'center'}}>
+              <div style={{padding:'10px',background:'var(--glass)',borderRadius:10,textAlign:'center'}}>
                 <div style={{fontSize:10,color:'var(--text3)',marginBottom:3}}>Valoare factura</div>
                 <div style={{fontSize:17,fontWeight:800,color:'var(--l2)'}}>{lunaSelectata.valoare_factura?.toFixed(2)} RON</div>
               </div>
-              <div style={{padding:'10px',background:'rgba(255,255,255,0.72)',borderRadius:10,textAlign:'center'}}>
+              <div style={{padding:'10px',background:'var(--glass)',borderRadius:10,textAlign:'center'}}>
                 <div style={{fontSize:10,color:'var(--text3)',marginBottom:3}}>Pret per mc</div>
                 <div style={{fontSize:17,fontWeight:800,color:'var(--t1)'}}>{lunaSelectata.pret_per_mc?.toFixed(2)} RON</div>
               </div>
-              <div style={{padding:'10px',background:'rgba(255,255,255,0.72)',borderRadius:10,textAlign:'center'}}>
+              <div style={{padding:'10px',background:'var(--glass)',borderRadius:10,textAlign:'center'}}>
                 <div style={{fontSize:10,color:'var(--text3)',marginBottom:3}}>Repartizare</div>
                 <div style={{fontSize:14,fontWeight:800,color:'var(--text)',textTransform:'capitalize'}}>{lunaSelectata.mod_repartizare}</div>
               </div>
@@ -197,22 +197,22 @@ export default function Rapoarte() {
                     </div>
                   </div>
                   <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 1fr',gap:6}}>
-                    <div style={{textAlign:'center',padding:'6px',background:'rgba(255,255,255,0.72)',borderRadius:8}}>
+                    <div style={{textAlign:'center',padding:'6px',background:'var(--glass)',borderRadius:8}}>
                       <div style={{fontSize:9,color:'var(--text3)'}}>Consum</div>
                       <div style={{fontSize:12,fontWeight:700,color:'var(--t1)'}}>{item.consum_individual?.toFixed(2)}</div>
                       <div style={{fontSize:9,color:'var(--text3)'}}>mc</div>
                     </div>
-                    <div style={{textAlign:'center',padding:'6px',background:'rgba(255,255,255,0.72)',borderRadius:8}}>
+                    <div style={{textAlign:'center',padding:'6px',background:'var(--glass)',borderRadius:8}}>
                       <div style={{fontSize:9,color:'var(--text3)'}}>De platit</div>
                       <div style={{fontSize:12,fontWeight:700,color:'var(--text)'}}>{item.suma_calculata?.toFixed(0)}</div>
                       <div style={{fontSize:9,color:'var(--text3)'}}>RON</div>
                     </div>
-                    <div style={{textAlign:'center',padding:'6px',background:'rgba(255,255,255,0.72)',borderRadius:8}}>
+                    <div style={{textAlign:'center',padding:'6px',background:'var(--glass)',borderRadius:8}}>
                       <div style={{fontSize:9,color:'var(--text3)'}}>Platit</div>
                       <div style={{fontSize:12,fontWeight:700,color:'var(--t1)'}}>{item.suma_platita?.toFixed(0)}</div>
                       <div style={{fontSize:9,color:'var(--text3)'}}>RON</div>
                     </div>
-                    <div style={{textAlign:'center',padding:'6px',background:'rgba(255,255,255,0.72)',borderRadius:8}}>
+                    <div style={{textAlign:'center',padding:'6px',background:'var(--glass)',borderRadius:8}}>
                       <div style={{fontSize:9,color:'var(--text3)'}}>Rest</div>
                       <div style={{fontSize:12,fontWeight:700,color:rest>0?'#f97316':'var(--t1)'}}>{rest.toFixed(0)}</div>
                       <div style={{fontSize:9,color:'var(--text3)'}}>RON</div>
@@ -226,7 +226,7 @@ export default function Rapoarte() {
 
       </div>
 
-      <div style={{position:'fixed',bottom:0,left:0,right:0,background:'rgba(250,246,242,0.72)',backdropFilter:'blur(24px)',WebkitBackdropFilter:'blur(24px)',borderTop:'1px solid rgba(255,255,255,0.8)',display:'flex',justifyContent:'space-around',padding:'8px 0 20px',zIndex:100}}>
+      <div style={{position:'fixed',bottom:0,left:0,right:0,background:'var(--glass)',backdropFilter:'blur(24px)',WebkitBackdropFilter:'blur(24px)',borderTop:'1px solid rgba(255,255,255,0.8)',display:'flex',justifyContent:'space-around',padding:'8px 0 20px',zIndex:100}}>
         {[{icon:'📊',label:'Dashboard',href:'/dashboard'},{icon:'🔢',label:'Citiri',href:'/dashboard/citiri'},{icon:'💳',label:'Plati',href:'/dashboard/plati'},{icon:'📈',label:'Grafice',href:'/dashboard/grafice'},{icon:'⚙️',label:'Setari',href:'/dashboard/setari'}].map(item => (
           <a key={item.href} href={item.href} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:3,textDecoration:'none',minWidth:56}}>
             <span style={{fontSize:20}}>{item.icon}</span>

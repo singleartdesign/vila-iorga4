@@ -59,8 +59,8 @@ export default function LoginPage() {
               Citiri apometre, facturi și plăți pentru vecinii din Str. Nicolae Iorga nr. 4. Ai uitat parola? Scrie-i administratorului.
             </div>
             <button type="submit" disabled={loading} aria-label="Intră" style={{ display: 'flex', alignItems: 'center', gap: 0, border: 'none', background: 'transparent', cursor: loading ? 'wait' : 'pointer', padding: 0 }}>
-              <span style={{ height: 52, padding: '0 20px', display: 'flex', alignItems: 'center', borderRadius: 999, background: '#1d1c1b', color: '#fff', fontSize: 15, fontWeight: 600 }}>{loading ? 'Se conectează…' : 'Intră'}</span>
-              <span style={{ width: 52, height: 52, marginLeft: -10, borderRadius: '50%', background: '#1d1c1b', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, boxShadow: '0 0 0 3px rgba(245,238,231,0.9)' }}>›</span>
+              <span style={{ height: 52, padding: '0 20px', display: 'flex', alignItems: 'center', borderRadius: 999, background: '#1d1c1b', color: 'var(--glass)', fontSize: 15, fontWeight: 600 }}>{loading ? 'Se conectează…' : 'Intră'}</span>
+              <span style={{ width: 52, height: 52, marginLeft: -10, borderRadius: '50%', background: '#1d1c1b', color: 'var(--glass)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, boxShadow: '0 0 0 3px rgba(245,238,231,0.9)' }}>›</span>
             </button>
           </div>
         </form>

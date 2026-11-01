@@ -168,7 +168,7 @@ export default function Dashboard() {
   }
 
   if (loading) return (
-    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:'var(--bg)',fontFamily:'var(--font)'}}>
+    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:'transparent',fontFamily:'var(--font)'}}>
       <div style={{textAlign:'center'}}><div style={{fontSize:48}}>💧</div><div style={{color:'var(--text3)',fontWeight:600,marginTop:8}}>Se incarca...</div></div>
     </div>
   )
@@ -183,7 +183,7 @@ export default function Dashboard() {
   const valoareData = istoricLuni.map(l => ({luna:l.luna, an:l.an, valoare_factura:l.valoare_factura}))
 
   return (
-    <div style={{minHeight:'100vh',background:'var(--bg)',fontFamily:'var(--font)',paddingBottom:90}}>
+    <div style={{minHeight:'100vh',background:'transparent',fontFamily:'var(--font)',paddingBottom:90}}>
 
       <div style={{background:'var(--hdr)',padding:'14px 20px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
         <div style={{display:'flex',alignItems:'center',gap:10}}>
@@ -317,7 +317,7 @@ export default function Dashboard() {
 
       </div>
 
-      <div style={{position:'fixed',bottom:0,left:0,right:0,background:'rgba(250,246,242,0.72)',backdropFilter:'blur(24px)',WebkitBackdropFilter:'blur(24px)',borderTop:'1px solid rgba(255,255,255,0.8)',display:'flex',justifyContent:'space-around',padding:'8px 0 20px',zIndex:100,boxShadow:'0 -4px 20px rgba(0,0,0,0.06)'}}>
+      <div style={{position:'fixed',bottom:0,left:0,right:0,background:'var(--glass)',backdropFilter:'blur(24px)',WebkitBackdropFilter:'blur(24px)',borderTop:'1px solid rgba(255,255,255,0.8)',display:'flex',justifyContent:'space-around',padding:'8px 0 20px',zIndex:100,boxShadow:'0 -4px 20px rgba(0,0,0,0.06)'}}>
         {[
           {icon:'📊',label:'Dashboard',href:'/dashboard'},
           {icon:'🔢',label:'Citiri',href:'/dashboard/citiri'},

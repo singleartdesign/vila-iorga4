@@ -1,20 +1,31 @@
-@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800;900&display=swap');
 
 :root {
-  /* accent portocaliu (inlocuieste turcoazul) */
-  --t1: #1d1c1b; --t2: #ff8a2a; --t3: #ffa257; --t4: #ffc08b; --t5: #f6d6bd; --t6: #fbe7d6; --t7: #fbf4ee;
-  /* neutre calde (inlocuiesc movul) */
-  --l1: #1d1c1b; --l2: #3b3734; --l3: #2a2725; --l4: #a39b94; --l5: #dcd3cb; --l6: #ece5de; --l7: #f6f1ec;
-  --bg: #efe7df;
-  --surface: rgba(255,255,255,0.62);
-  --surface2: rgba(255,255,255,0.75);
-  --card: rgba(255,255,255,0.58);
-  --text: #1d1c1b; --text2: #4a4541; --text3: #9a928b;
-  --border: rgba(255,255,255,0.7);
-  --shadow: 0 10px 40px rgba(120,90,60,0.10), 0 1px 3px rgba(0,0,0,0.04);
+  /* accent portocaliu */
+  --t1: #1d1c1b; --t2: #ff8a2a; --t3: #ffa257; --t4: #ffc08b;
+  --t5: rgba(255,170,110,0.45); --t6: rgba(255,200,160,0.40); --t7: rgba(255,226,200,0.42);
+  /* neutre calde */
+  --l1: #1d1c1b; --l2: #3b3734; --l3: #2a2725; --l4: #a39b94;
+  --l5: rgba(220,211,203,0.7); --l6: rgba(236,229,222,0.55); --l7: rgba(255,255,255,0.40);
+
+  /* sticla */
+  --glass: rgba(255,255,255,0.42);
+  --glass-strong: rgba(255,255,255,0.62);
+  --bg: rgba(255,255,255,0.34);          /* randuri in interiorul cardurilor */
+  --surface: rgba(255,255,255,0.48);
+  --surface2: rgba(255,255,255,0.58);
+  --card: rgba(255,255,255,0.40);
+  --sheet: rgba(250,244,238,0.78);       /* ferestre modale de jos */
+  --warn-bg: rgba(255,237,213,0.62);
+  --err-bg: rgba(254,226,226,0.70);
+  --blur: blur(22px) saturate(170%);
+
+  --text: #1d1c1b; --text2: #4a4541; --text3: #8f877f;
+  --border: rgba(255,255,255,0.75);
+  --shadow: 0 12px 40px rgba(120,80,40,0.12), inset 0 1px 0 rgba(255,255,255,0.7);
   --r: 28px; --r-sm: 18px;
   --btn: #1d1c1b;
-  --hdr: radial-gradient(120% 160% at 88% -10%, rgba(255,138,42,0.65) 0%, rgba(255,138,42,0) 55%), #1d1c1b;
+  --hdr: radial-gradient(120% 160% at 88% -10%, rgba(255,138,42,0.55) 0%, rgba(255,138,42,0) 55%), rgba(29,28,27,0.78);
   --font: 'Urbanist', system-ui, -apple-system, sans-serif;
   --font-display: 'Urbanist', system-ui, -apple-system, sans-serif;
 }
@@ -24,14 +35,63 @@ html, body { min-height: 100%; }
 body {
   font-family: var(--font);
   color: var(--text);
-  background:
-    radial-gradient(40vmax 40vmax at 92% 8%, rgba(255,140,50,0.28), transparent 60%),
-    radial-gradient(45vmax 45vmax at 0% 100%, rgba(255,170,110,0.22), transparent 60%),
-    linear-gradient(180deg, #f3ece5 0%, #e9dfd5 100%);
+  background: linear-gradient(180deg, #f3ece5 0%, #e7dcd1 100%);
   background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
+  letter-spacing: 0.005em;
 }
+
+/* pete de culoare care se misca lent in spatele sticlei */
+body::before, body::after {
+  content: ''; position: fixed; z-index: -1; pointer-events: none;
+  border-radius: 50%; filter: blur(60px);
+}
+body::before {
+  width: 62vmax; height: 62vmax; top: -22vmax; right: -18vmax;
+  background: radial-gradient(circle at 40% 40%, rgba(255,140,40,0.55), rgba(255,170,100,0.25) 45%, transparent 70%);
+  animation: plutire1 26s ease-in-out infinite alternate;
+}
+body::after {
+  width: 55vmax; height: 55vmax; bottom: -24vmax; left: -20vmax;
+  background: radial-gradient(circle at 60% 50%, rgba(255,190,140,0.55), rgba(240,200,170,0.25) 45%, transparent 70%);
+  animation: plutire2 32s ease-in-out infinite alternate;
+}
+@keyframes plutire1 { from { transform: translate(0,0) scale(1); } to { transform: translate(-8vmax, 10vmax) scale(1.12); } }
+@keyframes plutire2 { from { transform: translate(0,0) scale(1); } to { transform: translate(10vmax, -8vmax) scale(1.08); } }
+
+/* efect de sticla pe orice element care foloseste fundalurile translucide */
+[style*="var(--card)"], [style*="var(--glass)"], [style*="var(--surface"], [style*="var(--sheet)"],
+[style*="var(--hdr)"], [style*="var(--warn-bg)"], [style*="var(--err-bg)"], [style*="var(--t7)"], [style*="var(--l7)"] {
+  -webkit-backdrop-filter: var(--blur);
+  backdrop-filter: var(--blur);
+}
+[style*="background:var(--card)"], [style*="background: var(--card)"], [style*="var(--sheet)"] {
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+[style*="var(--hdr)"] { position: sticky; top: 0; z-index: 20; border-bottom: 1px solid rgba(255,255,255,0.08); }
+
+/* aparitie lina a cardurilor */
+[style*="background:var(--card)"], [style*="background: var(--card)"] {
+  animation: apare .5s cubic-bezier(.2,.8,.2,1) both;
+}
+[style*="var(--sheet)"] { animation: urca .35s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes apare { from { opacity: 0; transform: translateY(10px) scale(.985); } to { opacity: 1; transform: none; } }
+@keyframes urca { from { transform: translateY(40px); opacity: .4; } to { transform: none; opacity: 1; } }
+
 input, textarea, select, button { font-family: var(--font); }
-input:focus, textarea:focus, select:focus { border-color: var(--t3) !important; box-shadow: 0 0 0 3px rgba(255,138,42,0.15); }
-button { transition: transform .12s ease, opacity .12s ease; }
-button:active { transform: scale(0.98); }
+input, textarea, select { background-color: rgba(255,255,255,0.5); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+input:focus, textarea:focus, select:focus { outline: none; border-color: var(--t3) !important; box-shadow: 0 0 0 4px rgba(255,138,42,0.16); }
+button, a { transition: transform .15s ease, opacity .15s ease, box-shadow .2s ease, background-color .2s ease; }
+button:hover:not(:disabled) { box-shadow: 0 6px 18px rgba(29,28,27,0.12); }
+button:active { transform: scale(0.97); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+@media print {
+  body::before, body::after { display: none; }
+  body { background: #fff; }
+  [style*="var(--card)"], [style*="var(--glass)"] { backdrop-filter: none; -webkit-backdrop-filter: none; animation: none; box-shadow: none; }
+}
