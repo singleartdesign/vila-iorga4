@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
 import Icon from '@/lib/Icon'
 import Avatar, { pregatesteAvatar } from '@/lib/Avatar'
+import { NOUTATI } from '@/lib/noutati'
 import { useRouter } from 'next/navigation'
 
 const CULORI = ['#0f8b8d','#7a5cc4','#e08a3c','#9aa5ad','#3d7fd1']
@@ -205,6 +206,16 @@ export default function Setari() {
             {saving ? 'Se salveaza...' : 'Salveaza parola noua'}
           </button>
         </div>
+
+        {/* NOUTATI */}
+        <a href="/noutati" style={{background:'var(--card)',borderRadius:'var(--r)',padding:'16px',display:'flex',alignItems:'center',gap:14,textDecoration:'none',color:'var(--text)'}}>
+          <span style={{width:44,height:44,borderRadius:'50%',background:'var(--btn)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><Icon name="info" size={20} /></span>
+          <span style={{flex:1,minWidth:0}}>
+            <span style={{display:'block',fontSize:14}}>Noutăți în aplicație</span>
+            <span style={{display:'block',fontSize:12,color:'var(--text3)'}}>v{NOUTATI[0].versiune} · {NOUTATI[0].data} · {NOUTATI[0].titlu}</span>
+          </span>
+          <span style={{fontSize:22,color:'var(--text3)'}}>›</span>
+        </a>
 
         {profile?.rol === 'administrator' && <>
         {/* UTILIZATORI */}

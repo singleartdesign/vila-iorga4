@@ -68,6 +68,7 @@ export default function LoginPage() {
 
         <div style={{ marginTop: 34, textAlign: 'center', fontSize: 11, color: '#7d8c97' }}>
           Versiunea {process.env.NEXT_PUBLIC_APP_VERSION} din {process.env.NEXT_PUBLIC_BUILD_DATE}{process.env.NEXT_PUBLIC_COMMIT ? ` · ${process.env.NEXT_PUBLIC_COMMIT}` : ''}
+          {' · '}<a href="/noutati" style={{ color: 'var(--t2)', textDecoration: 'none' }}>Ce e nou</a>
         </div>
       </div>
     </div>
