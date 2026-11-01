@@ -5,8 +5,8 @@ export default function manifest() {
     description: 'Citiri apometre, facturi și plăți pentru Vila Iorga 4',
     start_url: '/dashboard',
     display: 'standalone',
-    background_color: '#f1f5f9',
-    theme_color: '#7c3aed',
+    background_color: '#efe7df',
+    theme_color: '#1d1c1b',
     icons: [
       { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
       { src: '/icon-512.png', sizes: '512x512', type: 'image/png' },

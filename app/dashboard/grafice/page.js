@@ -78,12 +78,12 @@ export default function Grafice() {
   const pretData = luniAfisate.map(l => ({ val: parseFloat(l.pret_per_mc) || 0, luna: l.luna, an: l.an }))
 
   return (
-    <div style={{minHeight:'100vh', background:'var(--bg)', fontFamily:'Nunito,sans-serif', paddingBottom:80}}>
+    <div style={{minHeight:'100vh', background:'var(--bg)', fontFamily:'var(--font)', paddingBottom:80}}>
 
-      <div style={{background:'linear-gradient(135deg,#7c3aed,#0d9488)', padding:'14px 20px', display:'flex', alignItems:'center', gap:10}}>
+      <div style={{background:'var(--hdr)', padding:'14px 20px', display:'flex', alignItems:'center', gap:10}}>
         <a href="/dashboard" style={{color:'rgba(255,255,255,0.8)', textDecoration:'none', fontSize:20}}>←</a>
         <div>
-          <div style={{color:'#fff', fontWeight:800, fontSize:16, fontFamily:'Sora,sans-serif'}}>Grafice si Statistici</div>
+          <div style={{color:'#fff', fontWeight:800, fontSize:16, fontFamily:'var(--font-display)'}}>Grafice si Statistici</div>
           <div style={{color:'rgba(255,255,255,0.7)', fontSize:11}}>{luni.length} luni de date disponibile</div>
         </div>
       </div>
@@ -91,13 +91,13 @@ export default function Grafice() {
       <div style={{padding:'14px', display:'flex', flexDirection:'column', gap:12, maxWidth:700, margin:'0 auto'}}>
 
         {/* PERIOADA SELECTOR */}
-        <div style={{background:'#fff', borderRadius:'var(--r)', padding:'12px 14px', boxShadow:'var(--shadow)', border:'1px solid var(--border)'}}>
+        <div style={{background:'var(--card)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', borderRadius:'var(--r)', padding:'12px 14px', boxShadow:'var(--shadow)', border:'1px solid var(--border)'}}>
           <div style={{fontSize:12, fontWeight:700, color:'var(--text2)', marginBottom:8}}>Perioada afisata</div>
           <div style={{display:'flex', gap:8}}>
             {[6, 12, 24, luni.length].map(p => (
               <button key={p} onClick={() => setPerioada(p)} style={{
                 flex:1, padding:'8px 4px', borderRadius:10, border:'none', cursor:'pointer',
-                background: perioada === p ? 'linear-gradient(135deg,var(--l3),var(--t2))' : 'var(--bg)',
+                background: perioada === p ? 'var(--btn)' : 'var(--bg)',
                 color: perioada === p ? '#fff' : 'var(--text3)',
                 fontSize:12, fontWeight:700
               }}>
@@ -115,44 +115,44 @@ export default function Grafice() {
             {label:'Min consum', val:minConsum, unit:'mc', color:'var(--t2)'},
             {label:'Max consum', val:maxConsumTotal, unit:'mc', color:'#f97316'},
           ].map(s => (
-            <div key={s.label} style={{background:'#fff', borderRadius:'var(--r)', padding:'14px', boxShadow:'var(--shadow)', border:'1px solid var(--border)', textAlign:'center'}}>
+            <div key={s.label} style={{background:'var(--card)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', borderRadius:'var(--r)', padding:'14px', boxShadow:'var(--shadow)', border:'1px solid var(--border)', textAlign:'center'}}>
               <div style={{fontSize:10, color:'var(--text3)', fontWeight:700, textTransform:'uppercase', marginBottom:4}}>{s.label}</div>
-              <div style={{fontSize:22, fontWeight:800, color:s.color, fontFamily:'Sora,sans-serif'}}>{s.val}</div>
+              <div style={{fontSize:22, fontWeight:800, color:s.color, fontFamily:'var(--font-display)'}}>{s.val}</div>
               <div style={{fontSize:10, color:'var(--text3)'}}>{s.unit}</div>
             </div>
           ))}
         </div>
 
         {/* GRAFIC CONSUM */}
-        <div style={{background:'#fff', borderRadius:'var(--r)', padding:'16px', boxShadow:'var(--shadow)', border:'1px solid var(--border)'}}>
+        <div style={{background:'var(--card)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', borderRadius:'var(--r)', padding:'16px', boxShadow:'var(--shadow)', border:'1px solid var(--border)'}}>
           <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12}}>
-            <div style={{fontFamily:'Sora,sans-serif', fontSize:13, fontWeight:700}}>Consum facturat (mc)</div>
+            <div style={{fontFamily:'var(--font-display)', fontSize:13, fontWeight:700}}>Consum facturat (mc)</div>
             <div style={{fontSize:11, color:'var(--text3)'}}>← scroll</div>
           </div>
           <BarChart data={consumData} maxVal={maxConsum} colorActive="var(--t1)" colorInactive="rgba(20,184,166,0.25)" unit="mc" />
         </div>
 
         {/* GRAFIC VALOARE */}
-        <div style={{background:'#fff', borderRadius:'var(--r)', padding:'16px', boxShadow:'var(--shadow)', border:'1px solid var(--border)'}}>
+        <div style={{background:'var(--card)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', borderRadius:'var(--r)', padding:'16px', boxShadow:'var(--shadow)', border:'1px solid var(--border)'}}>
           <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12}}>
-            <div style={{fontFamily:'Sora,sans-serif', fontSize:13, fontWeight:700}}>Valoare facturi (RON)</div>
+            <div style={{fontFamily:'var(--font-display)', fontSize:13, fontWeight:700}}>Valoare facturi (RON)</div>
             <div style={{fontSize:11, color:'var(--text3)'}}>← scroll</div>
           </div>
           <BarChart data={valoareData} maxVal={maxValoare} colorActive="var(--l2)" colorInactive="rgba(139,92,246,0.2)" unit="RON" />
         </div>
 
         {/* GRAFIC PRET */}
-        <div style={{background:'#fff', borderRadius:'var(--r)', padding:'16px', boxShadow:'var(--shadow)', border:'1px solid var(--border)'}}>
+        <div style={{background:'var(--card)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', borderRadius:'var(--r)', padding:'16px', boxShadow:'var(--shadow)', border:'1px solid var(--border)'}}>
           <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12}}>
-            <div style={{fontFamily:'Sora,sans-serif', fontSize:13, fontWeight:700}}>Pret per mc (RON)</div>
+            <div style={{fontFamily:'var(--font-display)', fontSize:13, fontWeight:700}}>Pret per mc (RON)</div>
             <div style={{fontSize:11, color:'var(--text3)'}}>← scroll</div>
           </div>
           <BarChart data={pretData} maxVal={maxPret} colorActive="#f97316" colorInactive="rgba(249,115,22,0.2)" unit="RON" height={120} />
         </div>
 
         {/* LISTA TOATE LUNILE */}
-        <div style={{background:'#fff', borderRadius:'var(--r)', padding:'16px', boxShadow:'var(--shadow)', border:'1px solid var(--border)'}}>
-          <div style={{fontFamily:'Sora,sans-serif', fontSize:13, fontWeight:700, marginBottom:12}}>Toate lunile</div>
+        <div style={{background:'var(--card)', backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)', borderRadius:'var(--r)', padding:'16px', boxShadow:'var(--shadow)', border:'1px solid var(--border)'}}>
+          <div style={{fontFamily:'var(--font-display)', fontSize:13, fontWeight:700, marginBottom:12}}>Toate lunile</div>
           <div style={{display:'flex', flexDirection:'column', gap:6, maxHeight:350, overflowY:'auto'}}>
             {[...luni].reverse().map(luna => {
               const pct = (luna.consum_facturat / maxConsumTotal) * 100
@@ -174,7 +174,7 @@ export default function Grafice() {
 
       </div>
 
-      <div style={{position:'fixed', bottom:0, left:0, right:0, background:'#fff', borderTop:'1px solid var(--border)', display:'flex', justifyContent:'space-around', padding:'8px 0 20px', zIndex:100}}>
+      <div style={{position:'fixed', bottom:0, left:0, right:0, background:'rgba(250,246,242,0.72)', backdropFilter:'blur(24px)', WebkitBackdropFilter:'blur(24px)', borderTop:'1px solid rgba(255,255,255,0.8)', display:'flex', justifyContent:'space-around', padding:'8px 0 20px', zIndex:100}}>
         {[{icon:'📊',label:'Dashboard',href:'/dashboard'},{icon:'🔢',label:'Citiri',href:'/dashboard/citiri'},{icon:'💳',label:'Plati',href:'/dashboard/plati'},{icon:'📈',label:'Grafice',href:'/dashboard/grafice'},{icon:'⚙️',label:'Setari',href:'/dashboard/setari'}].map(item => (
           <a key={item.href} href={item.href} style={{display:'flex', flexDirection:'column', alignItems:'center', gap:3, textDecoration:'none', minWidth:56}}>
             <span style={{fontSize:20}}>{item.icon}</span>

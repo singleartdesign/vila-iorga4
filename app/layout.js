@@ -6,7 +6,7 @@ export const metadata = {
   appleWebApp: { capable: true, title: 'Iorga 4 Apă', statusBarStyle: 'default' },
 }
 
-export const viewport = { themeColor: '#7c3aed' }
+export const viewport = { themeColor: '#1d1c1b' }
 
 export default function RootLayout({ children }) {
   return (

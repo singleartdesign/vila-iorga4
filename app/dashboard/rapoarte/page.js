@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { verificaLuna, AlerteLuna, driveUrl, fmt, CULORI_AP } from '@/lib/verificari'
 
 const LUNI_NUME = ['','Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Nov','Dec']
-const CULORI = ['#e07b39','#2563a8','#059669','#7c3aed','#b91c1c']
+const CULORI = ['#0f8b8d','#7a5cc4','#e08a3c','#9aa5ad','#3d7fd1']
 
 export default function Rapoarte() {
   const [profile, setProfile] = useState(null)
@@ -71,13 +71,13 @@ export default function Rapoarte() {
   )
 
   return (
-    <div style={{minHeight:'100vh',background:'var(--bg)',fontFamily:'Nunito,sans-serif',paddingBottom:80}}>
+    <div style={{minHeight:'100vh',background:'var(--bg)',fontFamily:'var(--font)',paddingBottom:80}}>
 
-      <div style={{background:'linear-gradient(135deg,#7c3aed,#0d9488)',padding:'14px 20px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+      <div style={{background:'var(--hdr)',padding:'14px 20px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
         <div style={{display:'flex',alignItems:'center',gap:10}}>
           <a href="/dashboard" style={{color:'rgba(255,255,255,0.8)',textDecoration:'none',fontSize:20}}>←</a>
           <div>
-            <div style={{color:'#fff',fontWeight:800,fontSize:16,fontFamily:'Sora,sans-serif'}}>Rapoarte</div>
+            <div style={{color:'#fff',fontWeight:800,fontSize:16,fontFamily:'var(--font-display)'}}>Rapoarte</div>
             <div style={{color:'rgba(255,255,255,0.7)',fontSize:11}}>{lunaNume}</div>
           </div>
         </div>
@@ -87,13 +87,13 @@ export default function Rapoarte() {
       <div style={{padding:'14px',display:'flex',flexDirection:'column',gap:12,maxWidth:700,margin:'0 auto'}}>
 
         {/* SELECTIE LUNA */}
-        <div style={{background:'#fff',borderRadius:'var(--r)',padding:'14px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
+        <div style={{background:'var(--card)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderRadius:'var(--r)',padding:'14px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
           <div style={{fontSize:12,fontWeight:700,color:'var(--text2)',marginBottom:8}}>Selecteaza luna</div>
           <div style={{display:'flex',overflowX:'auto',gap:8,paddingBottom:4}}>
             {luni.map(luna => (
               <button key={luna.id} onClick={() => selectLuna(luna)} style={{
                 padding:'7px 14px',borderRadius:20,border:'none',cursor:'pointer',whiteSpace:'nowrap',
-                background: lunaSelectata?.id === luna.id ? 'linear-gradient(135deg,var(--l3),var(--t2))' : 'var(--bg)',
+                background: lunaSelectata?.id === luna.id ? 'var(--btn)' : 'var(--bg)',
                 color: lunaSelectata?.id === luna.id ? '#fff' : 'var(--text3)',
                 fontSize:12,fontWeight:700,flexShrink:0
               }}>
@@ -106,21 +106,21 @@ export default function Rapoarte() {
         {/* SUMAR LUNA */}
         {lunaSelectata && (
           <div style={{background:'linear-gradient(135deg,var(--t7),var(--l7))',borderRadius:'var(--r)',padding:'14px 16px',border:'1.5px solid var(--t5)'}}>
-            <div style={{fontFamily:'Sora,sans-serif',fontSize:14,fontWeight:700,marginBottom:10}}>Raport {lunaNume}</div>
+            <div style={{fontFamily:'var(--font-display)',fontSize:14,fontWeight:700,marginBottom:10}}>Raport {lunaNume}</div>
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
-              <div style={{padding:'10px',background:'#fff',borderRadius:10,textAlign:'center'}}>
+              <div style={{padding:'10px',background:'rgba(255,255,255,0.72)',borderRadius:10,textAlign:'center'}}>
                 <div style={{fontSize:10,color:'var(--text3)',marginBottom:3}}>Consum facturat</div>
                 <div style={{fontSize:17,fontWeight:800,color:'var(--t1)'}}>{lunaSelectata.consum_facturat} mc</div>
               </div>
-              <div style={{padding:'10px',background:'#fff',borderRadius:10,textAlign:'center'}}>
+              <div style={{padding:'10px',background:'rgba(255,255,255,0.72)',borderRadius:10,textAlign:'center'}}>
                 <div style={{fontSize:10,color:'var(--text3)',marginBottom:3}}>Valoare factura</div>
                 <div style={{fontSize:17,fontWeight:800,color:'var(--l2)'}}>{lunaSelectata.valoare_factura?.toFixed(2)} RON</div>
               </div>
-              <div style={{padding:'10px',background:'#fff',borderRadius:10,textAlign:'center'}}>
+              <div style={{padding:'10px',background:'rgba(255,255,255,0.72)',borderRadius:10,textAlign:'center'}}>
                 <div style={{fontSize:10,color:'var(--text3)',marginBottom:3}}>Pret per mc</div>
                 <div style={{fontSize:17,fontWeight:800,color:'var(--t1)'}}>{lunaSelectata.pret_per_mc?.toFixed(2)} RON</div>
               </div>
-              <div style={{padding:'10px',background:'#fff',borderRadius:10,textAlign:'center'}}>
+              <div style={{padding:'10px',background:'rgba(255,255,255,0.72)',borderRadius:10,textAlign:'center'}}>
                 <div style={{fontSize:10,color:'var(--text3)',marginBottom:3}}>Repartizare</div>
                 <div style={{fontSize:14,fontWeight:800,color:'var(--text)',textTransform:'capitalize'}}>{lunaSelectata.mod_repartizare}</div>
               </div>
@@ -130,7 +130,7 @@ export default function Rapoarte() {
 
         {/* VERIFICARI + ACTIUNI */}
         {lunaSelectata && (
-          <div style={{background:'#fff',borderRadius:'var(--r)',padding:'14px',boxShadow:'var(--shadow)',border:'1px solid var(--border)',display:'flex',flexDirection:'column',gap:10}}>
+          <div style={{background:'var(--card)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderRadius:'var(--r)',padding:'14px',boxShadow:'var(--shadow)',border:'1px solid var(--border)',display:'flex',flexDirection:'column',gap:10}}>
             <AlerteLuna probleme={verificaLuna(lunaSelectata, citiriLuna)} />
             {(lunaSelectata.nr_factura || lunaSelectata.index_general_nou != null) && (
               <div style={{fontSize:12,color:'var(--text2)'}}>
@@ -144,7 +144,7 @@ export default function Rapoarte() {
               </div>
             )}
             <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
-              <a href={`/dashboard/rapoarte/pdf?luna=${lunaSelectata.id}`} target="_blank" rel="noreferrer" style={{flex:1,minWidth:140,textAlign:'center',padding:'11px',borderRadius:12,background:'linear-gradient(135deg,var(--l3),var(--t2))',color:'#fff',fontSize:13,fontWeight:800,textDecoration:'none'}}>📄 Raport PDF pentru grup</a>
+              <a href={`/dashboard/rapoarte/pdf?luna=${lunaSelectata.id}`} target="_blank" rel="noreferrer" style={{flex:1,minWidth:140,textAlign:'center',padding:'11px',borderRadius:12,background:'var(--btn)',color:'#fff',fontSize:13,fontWeight:800,textDecoration:'none'}}>📄 Raport PDF pentru grup</a>
               {lunaSelectata.drive_folder_id && (
                 <a href={driveUrl(lunaSelectata.drive_folder_id)} target="_blank" rel="noreferrer" style={{flex:1,minWidth:140,textAlign:'center',padding:'11px',borderRadius:12,background:'var(--l7)',border:'1.5px solid var(--l5)',color:'var(--l1)',fontSize:13,fontWeight:800,textDecoration:'none'}}>📁 Poze apometre si aviz</a>
               )}
@@ -154,26 +154,26 @@ export default function Rapoarte() {
 
         {/* SUMAR PLATI */}
         <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10}}>
-          <div style={{background:'#fff',borderRadius:'var(--r)',padding:'14px',boxShadow:'var(--shadow)',textAlign:'center'}}>
+          <div style={{background:'var(--card)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderRadius:'var(--r)',padding:'14px',boxShadow:'var(--shadow)',textAlign:'center'}}>
             <div style={{fontSize:10,color:'var(--text3)',fontWeight:700,textTransform:'uppercase',marginBottom:4}}>Total</div>
-            <div style={{fontSize:18,fontWeight:800,color:'var(--text)',fontFamily:'Sora,sans-serif'}}>{totalCalc.toFixed(0)}</div>
+            <div style={{fontSize:18,fontWeight:800,color:'var(--text)',fontFamily:'var(--font-display)'}}>{totalCalc.toFixed(0)}</div>
             <div style={{fontSize:10,color:'var(--text3)'}}>RON</div>
           </div>
-          <div style={{background:'#fff',borderRadius:'var(--r)',padding:'14px',boxShadow:'var(--shadow)',textAlign:'center'}}>
+          <div style={{background:'var(--card)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderRadius:'var(--r)',padding:'14px',boxShadow:'var(--shadow)',textAlign:'center'}}>
             <div style={{fontSize:10,color:'var(--text3)',fontWeight:700,textTransform:'uppercase',marginBottom:4}}>Colectat</div>
-            <div style={{fontSize:18,fontWeight:800,color:'var(--t1)',fontFamily:'Sora,sans-serif'}}>{totalPlatit.toFixed(0)}</div>
+            <div style={{fontSize:18,fontWeight:800,color:'var(--t1)',fontFamily:'var(--font-display)'}}>{totalPlatit.toFixed(0)}</div>
             <div style={{fontSize:10,color:'var(--text3)'}}>RON</div>
           </div>
-          <div style={{background:'#fff',borderRadius:'var(--r)',padding:'14px',boxShadow:'var(--shadow)',textAlign:'center'}}>
+          <div style={{background:'var(--card)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderRadius:'var(--r)',padding:'14px',boxShadow:'var(--shadow)',textAlign:'center'}}>
             <div style={{fontSize:10,color:'var(--text3)',fontWeight:700,textTransform:'uppercase',marginBottom:4}}>Restant</div>
-            <div style={{fontSize:18,fontWeight:800,color:totalRest>0?'#f97316':'var(--t1)',fontFamily:'Sora,sans-serif'}}>{totalRest.toFixed(0)}</div>
+            <div style={{fontSize:18,fontWeight:800,color:totalRest>0?'#f97316':'var(--t1)',fontFamily:'var(--font-display)'}}>{totalRest.toFixed(0)}</div>
             <div style={{fontSize:10,color:'var(--text3)'}}>RON</div>
           </div>
         </div>
 
         {/* TABEL DETALIAT */}
-        <div style={{background:'#fff',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
-          <div style={{fontFamily:'Sora,sans-serif',fontSize:14,fontWeight:700,marginBottom:12}}>Detaliu per proprietar</div>
+        <div style={{background:'var(--card)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
+          <div style={{fontFamily:'var(--font-display)',fontSize:14,fontWeight:700,marginBottom:12}}>Detaliu per proprietar</div>
           <div style={{display:'flex',flexDirection:'column',gap:8}}>
             {situatie.length === 0 ? (
               <div style={{textAlign:'center',color:'var(--text3)',padding:'20px 0',fontSize:13}}>Nu exista date pentru luna selectata.</div>
@@ -197,22 +197,22 @@ export default function Rapoarte() {
                     </div>
                   </div>
                   <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 1fr',gap:6}}>
-                    <div style={{textAlign:'center',padding:'6px',background:'#fff',borderRadius:8}}>
+                    <div style={{textAlign:'center',padding:'6px',background:'rgba(255,255,255,0.72)',borderRadius:8}}>
                       <div style={{fontSize:9,color:'var(--text3)'}}>Consum</div>
                       <div style={{fontSize:12,fontWeight:700,color:'var(--t1)'}}>{item.consum_individual?.toFixed(2)}</div>
                       <div style={{fontSize:9,color:'var(--text3)'}}>mc</div>
                     </div>
-                    <div style={{textAlign:'center',padding:'6px',background:'#fff',borderRadius:8}}>
+                    <div style={{textAlign:'center',padding:'6px',background:'rgba(255,255,255,0.72)',borderRadius:8}}>
                       <div style={{fontSize:9,color:'var(--text3)'}}>De platit</div>
                       <div style={{fontSize:12,fontWeight:700,color:'var(--text)'}}>{item.suma_calculata?.toFixed(0)}</div>
                       <div style={{fontSize:9,color:'var(--text3)'}}>RON</div>
                     </div>
-                    <div style={{textAlign:'center',padding:'6px',background:'#fff',borderRadius:8}}>
+                    <div style={{textAlign:'center',padding:'6px',background:'rgba(255,255,255,0.72)',borderRadius:8}}>
                       <div style={{fontSize:9,color:'var(--text3)'}}>Platit</div>
                       <div style={{fontSize:12,fontWeight:700,color:'var(--t1)'}}>{item.suma_platita?.toFixed(0)}</div>
                       <div style={{fontSize:9,color:'var(--text3)'}}>RON</div>
                     </div>
-                    <div style={{textAlign:'center',padding:'6px',background:'#fff',borderRadius:8}}>
+                    <div style={{textAlign:'center',padding:'6px',background:'rgba(255,255,255,0.72)',borderRadius:8}}>
                       <div style={{fontSize:9,color:'var(--text3)'}}>Rest</div>
                       <div style={{fontSize:12,fontWeight:700,color:rest>0?'#f97316':'var(--t1)'}}>{rest.toFixed(0)}</div>
                       <div style={{fontSize:9,color:'var(--text3)'}}>RON</div>
@@ -226,7 +226,7 @@ export default function Rapoarte() {
 
       </div>
 
-      <div style={{position:'fixed',bottom:0,left:0,right:0,background:'#fff',borderTop:'1px solid var(--border)',display:'flex',justifyContent:'space-around',padding:'8px 0 20px',zIndex:100}}>
+      <div style={{position:'fixed',bottom:0,left:0,right:0,background:'rgba(250,246,242,0.72)',backdropFilter:'blur(24px)',WebkitBackdropFilter:'blur(24px)',borderTop:'1px solid rgba(255,255,255,0.8)',display:'flex',justifyContent:'space-around',padding:'8px 0 20px',zIndex:100}}>
         {[{icon:'📊',label:'Dashboard',href:'/dashboard'},{icon:'🔢',label:'Citiri',href:'/dashboard/citiri'},{icon:'💳',label:'Plati',href:'/dashboard/plati'},{icon:'📈',label:'Grafice',href:'/dashboard/grafice'},{icon:'⚙️',label:'Setari',href:'/dashboard/setari'}].map(item => (
           <a key={item.href} href={item.href} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:3,textDecoration:'none',minWidth:56}}>
             <span style={{fontSize:20}}>{item.icon}</span>

@@ -19,7 +19,7 @@ function formDin(l) {
   }
 }
 const numOrNull = v => (v === '' || v === null || isNaN(parseFloat(v))) ? null : parseFloat(v)
-const inputStil = {width:'100%',padding:'11px',border:'1.5px solid var(--border)',borderRadius:10,fontSize:14,fontFamily:'Nunito,sans-serif',outline:'none',fontWeight:600}
+const inputStil = {width:'100%',padding:'11px',border:'1px solid rgba(29,28,27,0.08)',background:'rgba(255,255,255,0.7)',borderRadius:16,fontSize:14,fontFamily:'var(--font)',outline:'none',fontWeight:600}
 const labelStil = {display:'block',fontSize:12,fontWeight:600,color:'var(--text2)',marginBottom:5}
 
 export default function Facturi() {
@@ -116,13 +116,13 @@ export default function Facturi() {
   )
 
   return (
-    <div style={{minHeight:'100vh',background:'var(--bg)',fontFamily:'Nunito,sans-serif',paddingBottom:80}}>
+    <div style={{minHeight:'100vh',background:'var(--bg)',fontFamily:'var(--font)',paddingBottom:80}}>
 
-      <div style={{background:'linear-gradient(135deg,#7c3aed,#0d9488)',padding:'14px 20px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+      <div style={{background:'var(--hdr)',padding:'14px 20px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
         <div style={{display:'flex',alignItems:'center',gap:10}}>
           <a href="/dashboard" style={{color:'rgba(255,255,255,0.8)',textDecoration:'none',fontSize:20}}>←</a>
           <div>
-            <div style={{color:'#fff',fontWeight:800,fontSize:16,fontFamily:'Sora,sans-serif'}}>Facturi lunare</div>
+            <div style={{color:'#fff',fontWeight:800,fontSize:16,fontFamily:'var(--font-display)'}}>Facturi lunare</div>
             <div style={{color:'rgba(255,255,255,0.7)',fontSize:11}}>{lunaActuala ? `${LUNI_NUME[lunaActuala.luna]} ${lunaActuala.an}` : ''}</div>
           </div>
         </div>
@@ -142,8 +142,8 @@ export default function Facturi() {
         )}
 
         {lunaActuala && (
-          <div style={{background:'#fff',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
-            <div style={{fontFamily:'Sora,sans-serif',fontSize:14,fontWeight:700,marginBottom:14}}>
+          <div style={{background:'var(--card)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
+            <div style={{fontFamily:'var(--font-display)',fontSize:14,fontWeight:700,marginBottom:14}}>
               Factura {LUNI_NUME[lunaActuala.luna]} {lunaActuala.an}
             </div>
 
@@ -152,7 +152,7 @@ export default function Facturi() {
                 <label style={{display:'block',fontSize:12,fontWeight:600,color:'var(--text2)',marginBottom:5}}>Valoare factura (RON)</label>
                 <input type="number" step="0.01" value={form.valoare_factura}
                   onChange={e => setForm({...form, valoare_factura: e.target.value})}
-                  style={{width:'100%',padding:'11px',border:'1.5px solid var(--border)',borderRadius:10,fontSize:15,fontFamily:'Nunito,sans-serif',outline:'none',fontWeight:700}}
+                  style={{width:'100%',padding:'11px',border:'1px solid rgba(29,28,27,0.08)',background:'rgba(255,255,255,0.7)',borderRadius:16,fontSize:15,fontFamily:'var(--font)',outline:'none',fontWeight:700}}
                   placeholder="0.00"
                 />
               </div>
@@ -160,7 +160,7 @@ export default function Facturi() {
                 <label style={{display:'block',fontSize:12,fontWeight:600,color:'var(--text2)',marginBottom:5}}>Consum facturat RAGCL (mc)</label>
                 <input type="number" step="0.001" value={form.consum_facturat}
                   onChange={e => setForm({...form, consum_facturat: e.target.value})}
-                  style={{width:'100%',padding:'11px',border:'1.5px solid var(--border)',borderRadius:10,fontSize:15,fontFamily:'Nunito,sans-serif',outline:'none',fontWeight:700}}
+                  style={{width:'100%',padding:'11px',border:'1px solid rgba(29,28,27,0.08)',background:'rgba(255,255,255,0.7)',borderRadius:16,fontSize:15,fontFamily:'var(--font)',outline:'none',fontWeight:700}}
                   placeholder="0.000"
                 />
               </div>
@@ -252,7 +252,7 @@ export default function Facturi() {
             <div style={{marginBottom:14}}>
               <label style={{display:'block',fontSize:12,fontWeight:600,color:'var(--text2)',marginBottom:5}}>Note (optional)</label>
               <textarea value={form.note} onChange={e => setForm({...form, note: e.target.value})}
-                style={{width:'100%',padding:'10px',border:'1.5px solid var(--border)',borderRadius:10,fontSize:13,fontFamily:'Nunito,sans-serif',outline:'none',resize:'vertical',minHeight:60}}
+                style={{width:'100%',padding:'10px',border:'1px solid rgba(29,28,27,0.08)',background:'rgba(255,255,255,0.7)',borderRadius:16,fontSize:13,fontFamily:'var(--font)',outline:'none',resize:'vertical',minHeight:60}}
                 placeholder="ex: Teava sparta la Ap. 3, pierdere atribuita acestuia..."
               />
             </div>
@@ -277,13 +277,13 @@ export default function Facturi() {
                 if (j.ok) ok++; else err = j.error || r.statusText
               }
               setMsg(ok === cuPoza.length ? `Gata: ${ok} poze salvate in Drive.` : `${ok} din ${cuPoza.length} poze salvate. Eroare: ${err}`); setMsgType(ok === cuPoza.length ? 'success' : 'error'); await loadData()
-            }} style={{width:'100%',padding:'11px',marginBottom:10,background:'#fff',border:'1.5px solid var(--border)',borderRadius:12,color:'var(--text2)',fontSize:13,fontWeight:700,cursor:'pointer'}}>
+            }} style={{width:'100%',padding:'11px',marginBottom:10,background:'rgba(255,255,255,0.72)',border:'1.5px solid var(--border)',borderRadius:12,color:'var(--text2)',fontSize:13,fontWeight:700,cursor:'pointer'}}>
               📁 Trimite pozele lunii in Drive
             </button>
 
             <button onClick={salveazaFactura} disabled={saving} style={{
               width:'100%',padding:'13px',
-              background:'linear-gradient(135deg,var(--l3),var(--t2))',
+              background:'var(--btn)',
               border:'none',borderRadius:12,color:'#fff',fontSize:14,fontWeight:800,cursor:'pointer'
             }}>
               {saving ? 'Se salveaza...' : '💾 Salveaza factura'}
@@ -291,8 +291,8 @@ export default function Facturi() {
           </div>
         )}
 
-        <div style={{background:'#fff',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
-          <div style={{fontFamily:'Sora,sans-serif',fontSize:14,fontWeight:700,marginBottom:12}}>Istoric facturi</div>
+        <div style={{background:'var(--card)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
+          <div style={{fontFamily:'var(--font-display)',fontSize:14,fontWeight:700,marginBottom:12}}>Istoric facturi</div>
           <div style={{display:'flex',flexDirection:'column',gap:6}}>
             {luni.map(luna => (
               <div key={luna.id} onClick={() => { selecteaza(luna); window.scrollTo(0,0) }}
@@ -318,7 +318,7 @@ export default function Facturi() {
 
       </div>
 
-      <div style={{position:'fixed',bottom:0,left:0,right:0,background:'#fff',borderTop:'1px solid var(--border)',display:'flex',justifyContent:'space-around',padding:'8px 0 20px',zIndex:100}}>
+      <div style={{position:'fixed',bottom:0,left:0,right:0,background:'rgba(250,246,242,0.72)',backdropFilter:'blur(24px)',WebkitBackdropFilter:'blur(24px)',borderTop:'1px solid rgba(255,255,255,0.8)',display:'flex',justifyContent:'space-around',padding:'8px 0 20px',zIndex:100}}>
         {[{icon:'📊',label:'Dashboard',href:'/dashboard'},{icon:'🔢',label:'Citiri',href:'/dashboard/citiri'},{icon:'💳',label:'Plati',href:'/dashboard/plati'},{icon:'📈',label:'Grafice',href:'/dashboard/grafice'},{icon:'⚙️',label:'Setari',href:'/dashboard/setari'}].map(item => (
           <a key={item.href} href={item.href} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:3,textDecoration:'none',minWidth:56}}>
             <span style={{fontSize:20}}>{item.icon}</span>

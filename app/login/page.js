@@ -24,83 +24,50 @@ export default function LoginPage() {
     }
   }
 
+  const pill = { display: 'flex', alignItems: 'center', gap: 12, padding: 6, paddingRight: 8, borderRadius: 999, background: 'rgba(255,255,255,0.55)', border: '1px solid rgba(255,255,255,0.8)', marginBottom: 14 }
+  const icon = { width: 40, height: 40, borderRadius: '50%', background: 'rgba(255,255,255,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, color: '#1d1c1b', flexShrink: 0 }
+  const input = { flex: 1, border: 'none', outline: 'none', background: 'transparent', fontSize: 16, color: '#1d1c1b', padding: '10px 0', minWidth: 0 }
+
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #5b21b6 0%, #1565c0 50%, #0ea5e9 100%)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontFamily: 'system-ui, sans-serif'
-    }}>
-      <div style={{
-        background: 'white', borderRadius: 20, padding: '48px 40px',
-        width: 400, boxShadow: '0 20px 60px rgba(0,0,0,0.25)'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 32 }}>
-          <div style={{
-            width: 48, height: 48, borderRadius: 12,
-            background: 'linear-gradient(135deg, #0ea5e9, #7c3aed)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24
-          }}>💧</div>
-          <div>
-            <div style={{ fontWeight: 700, fontSize: 20, color: '#1e293b' }}>Vila Iorga 4</div>
-            <div style={{ fontSize: 12, color: '#94a3b8' }}>Administrare consum apă</div>
-            <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>
-              Versiunea {process.env.NEXT_PUBLIC_APP_VERSION} din {process.env.NEXT_PUBLIC_BUILD_DATE}{process.env.NEXT_PUBLIC_COMMIT ? ` · ${process.env.NEXT_PUBLIC_COMMIT}` : ''}
-            </div>
-          </div>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, position: 'relative', overflow: 'hidden' }}>
+      {/* decor: soare portocaliu si sfera */}
+      <div style={{ position: 'absolute', width: 420, height: 420, borderRadius: '50%', right: '-120px', top: '8%', background: 'radial-gradient(circle at 35% 35%, #ffb066 0%, #ff7a1a 55%, rgba(255,122,26,0) 72%)', filter: 'blur(8px)', opacity: 0.85 }} />
+      <div style={{ position: 'absolute', width: 260, height: 260, borderRadius: '50%', left: '-80px', bottom: '6%', background: 'radial-gradient(circle at 30% 30%, #ffffff 0%, #f1e8e0 45%, #e2d3c5 75%, #ff9a4d 100%)', boxShadow: '0 30px 60px rgba(120,80,40,0.18)' }} />
+
+      <div style={{ position: 'relative', width: '100%', maxWidth: 420, borderRadius: 36, padding: '34px 30px 28px', background: 'rgba(245,238,231,0.62)', backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)', border: '1px solid rgba(255,255,255,0.75)', boxShadow: '0 30px 80px rgba(110,80,50,0.18)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 44 }}>
+          <div style={{ fontSize: 18, color: '#6f6862', fontWeight: 500 }}>Vila Iorga 4</div>
+          <div style={{ fontSize: 18, color: '#1d1c1b', fontWeight: 500 }}>Apă 💧</div>
         </div>
 
-        <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 6, color: '#1e293b' }}>
-          Bine ai revenit
-        </h2>
-        <p style={{ fontSize: 13, color: '#94a3b8', marginBottom: 24 }}>
-          Introdu datele de autentificare
-        </p>
+        <div style={{ fontSize: 40, fontWeight: 500, color: '#1d1c1b', letterSpacing: '-0.02em', marginBottom: 26 }}>Intră în cont</div>
 
         <form onSubmit={handleLogin}>
-          <div style={{ marginBottom: 14 }}>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#475569', marginBottom: 5 }}>
-              Email
-            </label>
-            <input
-              type="email" value={email} onChange={e => setEmail(e.target.value)}
-              placeholder="email@exemplu.ro" required
-              style={{
-                width: '100%', padding: '10px 12px', border: '1.5px solid #e2e8f0',
-                borderRadius: 10, fontSize: 14, outline: 'none', boxSizing: 'border-box'
-              }}
-            />
+          <div style={pill}>
+            <div style={icon}>@</div>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="adresa de email" required autoComplete="email" style={input} />
           </div>
-          <div style={{ marginBottom: 20 }}>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#475569', marginBottom: 5 }}>
-              Parolă
-            </label>
-            <input
-              type="password" value={password} onChange={e => setPassword(e.target.value)}
-              placeholder="••••••••" required
-              style={{
-                width: '100%', padding: '10px 12px', border: '1.5px solid #e2e8f0',
-                borderRadius: 10, fontSize: 14, outline: 'none', boxSizing: 'border-box'
-              }}
-            />
+          <div style={pill}>
+            <div style={icon}>🔑</div>
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="parola" required autoComplete="current-password" style={input} />
           </div>
 
-          {error && (
-            <div style={{
-              padding: '10px 14px', background: '#fee2e2', borderRadius: 8,
-              color: '#b91c1c', fontSize: 13, marginBottom: 16
-            }}>{error}</div>
-          )}
+          {error && <div style={{ padding: '10px 16px', background: 'rgba(255,255,255,0.7)', borderRadius: 16, color: '#b4410b', fontSize: 14, marginBottom: 14 }}>{error}</div>}
 
-          <button type="submit" disabled={loading} style={{
-            width: '100%', padding: 13,
-            background: loading ? '#94a3b8' : 'linear-gradient(135deg, #7c3aed, #0ea5e9)',
-            border: 'none', borderRadius: 12, color: 'white',
-            fontSize: 14, fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer'
-          }}>
-            {loading ? 'Se conectează...' : 'Intră în aplicație →'}
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, marginTop: 22 }}>
+            <div style={{ fontSize: 12, lineHeight: 1.5, color: '#6f6862', maxWidth: 230 }}>
+              Citiri apometre, facturi și plăți pentru vecinii din Str. Nicolae Iorga nr. 4. Ai uitat parola? Scrie-i administratorului.
+            </div>
+            <button type="submit" disabled={loading} aria-label="Intră" style={{ display: 'flex', alignItems: 'center', gap: 0, border: 'none', background: 'transparent', cursor: loading ? 'wait' : 'pointer', padding: 0 }}>
+              <span style={{ height: 52, padding: '0 20px', display: 'flex', alignItems: 'center', borderRadius: 999, background: '#1d1c1b', color: '#fff', fontSize: 15, fontWeight: 600 }}>{loading ? 'Se conectează…' : 'Intră'}</span>
+              <span style={{ width: 52, height: 52, marginLeft: -10, borderRadius: '50%', background: '#1d1c1b', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, boxShadow: '0 0 0 3px rgba(245,238,231,0.9)' }}>›</span>
+            </button>
+          </div>
         </form>
+
+        <div style={{ marginTop: 34, textAlign: 'center', fontSize: 11, color: '#9a928b' }}>
+          Versiunea {process.env.NEXT_PUBLIC_APP_VERSION} din {process.env.NEXT_PUBLIC_BUILD_DATE}{process.env.NEXT_PUBLIC_COMMIT ? ` · ${process.env.NEXT_PUBLIC_COMMIT}` : ''}
+        </div>
       </div>
     </div>
   )

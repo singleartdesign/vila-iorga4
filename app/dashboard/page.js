@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { sumaApometreCorectata } from '@/lib/verificari'
 
 const LUNI_NUME = ['','Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Nov','Dec']
-const CULORI = ['#e07b39','#2563a8','#059669','#7c3aed','#b91c1c']
+const CULORI = ['#0f8b8d','#7a5cc4','#e08a3c','#9aa5ad','#3d7fd1']
 const CULORI_LIGHT = ['rgba(224,123,57,0.2)','rgba(37,99,168,0.2)','rgba(5,150,105,0.2)','rgba(124,58,237,0.2)','rgba(185,28,28,0.2)']
 
 function BarChart({ data, valueKey, color, colorLight, unit, height=140 }) {
@@ -168,7 +168,7 @@ export default function Dashboard() {
   }
 
   if (loading) return (
-    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:'var(--bg)',fontFamily:'Nunito,sans-serif'}}>
+    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:'var(--bg)',fontFamily:'var(--font)'}}>
       <div style={{textAlign:'center'}}><div style={{fontSize:48}}>💧</div><div style={{color:'var(--text3)',fontWeight:600,marginTop:8}}>Se incarca...</div></div>
     </div>
   )
@@ -183,13 +183,13 @@ export default function Dashboard() {
   const valoareData = istoricLuni.map(l => ({luna:l.luna, an:l.an, valoare_factura:l.valoare_factura}))
 
   return (
-    <div style={{minHeight:'100vh',background:'var(--bg)',fontFamily:'Nunito,sans-serif',paddingBottom:90}}>
+    <div style={{minHeight:'100vh',background:'var(--bg)',fontFamily:'var(--font)',paddingBottom:90}}>
 
-      <div style={{background:'linear-gradient(135deg,#7c3aed,#0d9488)',padding:'14px 20px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+      <div style={{background:'var(--hdr)',padding:'14px 20px',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
         <div style={{display:'flex',alignItems:'center',gap:10}}>
           <span style={{fontSize:22}}>💧</span>
           <div>
-            <div style={{color:'#fff',fontWeight:800,fontSize:16,fontFamily:'Sora,sans-serif'}}>Vila Iorga 4</div>
+            <div style={{color:'#fff',fontWeight:800,fontSize:16,fontFamily:'var(--font-display)'}}>Vila Iorga 4</div>
             <div style={{color:'rgba(255,255,255,0.7)',fontSize:11}}>Administrare apa</div>
           </div>
         </div>
@@ -202,7 +202,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div style={{background:'#fff',borderBottom:'1px solid var(--border)',display:'flex',overflowX:'auto',padding:'0 10px'}}>
+      <div style={{background:'rgba(250,246,242,0.55)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderBottom:'1px solid rgba(255,255,255,0.7)',display:'flex',overflowX:'auto',padding:'0 10px'}}>
         {[
           {label:'Dashboard',icon:'📊',href:'/dashboard'},
           {label:'Citiri',icon:'🔢',href:'/dashboard/citiri'},
@@ -226,11 +226,11 @@ export default function Dashboard() {
           <div style={{background:'linear-gradient(135deg,var(--t7),var(--l7))',border:'1.5px solid var(--t5)',borderRadius:'var(--r)',padding:'14px 16px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
             <div>
               <div style={{fontSize:12,color:'var(--text3)',fontWeight:600,marginBottom:3}}>LUNA CURENTA</div>
-              <div style={{fontSize:18,fontWeight:800,color:'var(--text)',fontFamily:'Sora,sans-serif'}}>{lunaNume}</div>
+              <div style={{fontSize:18,fontWeight:800,color:'var(--text)',fontFamily:'var(--font-display)'}}>{lunaNume}</div>
               <div style={{fontSize:12,color:'var(--text2)',marginTop:2}}>{lunaActuala.consum_facturat} mc · {lunaActuala.pret_per_mc?.toFixed(2)} RON/mc</div>
             </div>
             <div style={{textAlign:'right'}}>
-              <div style={{fontSize:22,fontWeight:800,color:'var(--l2)',fontFamily:'Sora,sans-serif'}}>{totalFactura.toFixed(2)}</div>
+              <div style={{fontSize:22,fontWeight:800,color:'var(--l2)',fontFamily:'var(--font-display)'}}>{totalFactura.toFixed(2)}</div>
               <div style={{fontSize:11,color:'var(--text3)'}}>RON total factura</div>
             </div>
           </div>
@@ -243,15 +243,15 @@ export default function Dashboard() {
             !(Number(lunaActuala?.consum_facturat) > 0) ? {label:'Factura', val:'in asteptare', unit:'', color:'var(--text3)'} : {label: pierdere > 0.005 ? 'Contor general peste apometre' : pierdere < -0.005 ? 'Apometre peste contor general' : 'Contor general = apometre', val:(pierdere > 0.005 ? '+' : pierdere < -0.005 ? '−' : '')+Math.abs(pierdere).toFixed(2),unit:'mc',color:Math.abs(pierdere) > 0.005 ? '#f97316' : 'var(--t1)'},
             {label:'Citiri',val:`${citiri.length}/5`,unit:'introduse',color:'var(--l2)'},
           ].map(s => (
-            <div key={s.label} style={{background:'#fff',borderRadius:'var(--r)',padding:'14px 16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
+            <div key={s.label} style={{background:'var(--card)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderRadius:'var(--r)',padding:'14px 16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
               <div style={{fontSize:10,color:'var(--text3)',fontWeight:700,textTransform:'uppercase',letterSpacing:0.5,marginBottom:6}}>{s.label}</div>
-              <div style={{fontSize:22,fontWeight:800,color:s.color,fontFamily:'Sora,sans-serif'}}>{s.val} <span style={{fontSize:12,color:'var(--text3)',fontWeight:500}}>{s.unit}</span></div>
+              <div style={{fontSize:22,fontWeight:800,color:s.color,fontFamily:'var(--font-display)'}}>{s.val} <span style={{fontSize:12,color:'var(--text3)',fontWeight:500}}>{s.unit}</span></div>
             </div>
           ))}
         </div>
 
-        <div style={{background:'#fff',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
-          <div style={{fontFamily:'Sora,sans-serif',fontSize:14,fontWeight:700,marginBottom:12}}>Situatie plati - {lunaNume}</div>
+        <div style={{background:'var(--card)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
+          <div style={{fontFamily:'var(--font-display)',fontSize:14,fontWeight:700,marginBottom:12}}>Situatie plati - {lunaNume}</div>
           <div style={{display:'flex',flexDirection:'column',gap:8}}>
             {calcule.length === 0 ? (
               <div style={{textAlign:'center',color:'var(--text3)',padding:'20px 0',fontSize:13}}>Nu exista calcule pentru luna aceasta.</div>
@@ -276,7 +276,7 @@ export default function Dashboard() {
                         luna {Number(calc.suma_calculata).toFixed(2)} {Number(plata.sold_anterior) < 0 ? `− avans ${(-Number(plata.sold_anterior)).toFixed(2)}` : `+ restanta ${Number(plata.sold_anterior).toFixed(2)}`}
                       </div>
                     )}
-                    <div style={{fontSize:14,fontWeight:800,color:c.text,fontFamily:'Sora,sans-serif'}}>{((Number(calc.suma_calculata)||0)+(Number(plata?.sold_anterior)||0)).toFixed(2)} RON</div>
+                    <div style={{fontSize:14,fontWeight:800,color:c.text,fontFamily:'var(--font-display)'}}>{((Number(calc.suma_calculata)||0)+(Number(plata?.sold_anterior)||0)).toFixed(2)} RON</div>
                     <div style={{fontSize:10,fontWeight:700,color:c.text}}>{c.label}</div>
                   </div>
                 </div>
@@ -286,9 +286,9 @@ export default function Dashboard() {
         </div>
 
         {istoricLuni.length > 0 && (
-          <div style={{background:'#fff',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
+          <div style={{background:'var(--card)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
-              <div style={{fontFamily:'Sora,sans-serif',fontSize:13,fontWeight:700}}>Consum facturat - 12 luni (mc)</div>
+              <div style={{fontFamily:'var(--font-display)',fontSize:13,fontWeight:700}}>Consum facturat - 12 luni (mc)</div>
               <div style={{fontSize:10,color:'var(--text3)'}}>← scroll</div>
             </div>
             <BarChart data={consumData} valueKey="consum_facturat" color="var(--t1)" colorLight="rgba(20,184,166,0.25)" unit="mc" />
@@ -296,9 +296,9 @@ export default function Dashboard() {
         )}
 
         {istoricLuni.length > 0 && (
-          <div style={{background:'#fff',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
+          <div style={{background:'var(--card)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
-              <div style={{fontFamily:'Sora,sans-serif',fontSize:13,fontWeight:700}}>Valoare facturi - 12 luni (RON)</div>
+              <div style={{fontFamily:'var(--font-display)',fontSize:13,fontWeight:700}}>Valoare facturi - 12 luni (RON)</div>
               <div style={{fontSize:10,color:'var(--text3)'}}>← scroll</div>
             </div>
             <BarChart data={valoareData} valueKey="valoare_factura" color="var(--l2)" colorLight="rgba(124,58,237,0.2)" unit="RON" />
@@ -306,9 +306,9 @@ export default function Dashboard() {
         )}
 
         {apartamente.length > 0 && citiriIst.length > 0 && (
-          <div style={{background:'#fff',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
+          <div style={{background:'var(--card)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
-              <div style={{fontFamily:'Sora,sans-serif',fontSize:13,fontWeight:700}}>Consum per proprietar - 12 luni</div>
+              <div style={{fontFamily:'var(--font-display)',fontSize:13,fontWeight:700}}>Consum per proprietar - 12 luni</div>
               <div style={{fontSize:10,color:'var(--text3)'}}>← scroll</div>
             </div>
             <ProprietarChart luni={istoricLuni} citiriIst={citiriIst} apartamente={apartamente} />
@@ -317,7 +317,7 @@ export default function Dashboard() {
 
       </div>
 
-      <div style={{position:'fixed',bottom:0,left:0,right:0,background:'#fff',borderTop:'1px solid var(--border)',display:'flex',justifyContent:'space-around',padding:'8px 0 20px',zIndex:100,boxShadow:'0 -4px 20px rgba(0,0,0,0.06)'}}>
+      <div style={{position:'fixed',bottom:0,left:0,right:0,background:'rgba(250,246,242,0.72)',backdropFilter:'blur(24px)',WebkitBackdropFilter:'blur(24px)',borderTop:'1px solid rgba(255,255,255,0.8)',display:'flex',justifyContent:'space-around',padding:'8px 0 20px',zIndex:100,boxShadow:'0 -4px 20px rgba(0,0,0,0.06)'}}>
         {[
           {icon:'📊',label:'Dashboard',href:'/dashboard'},
           {icon:'🔢',label:'Citiri',href:'/dashboard/citiri'},
