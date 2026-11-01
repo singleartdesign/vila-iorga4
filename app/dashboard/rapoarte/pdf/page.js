@@ -92,7 +92,7 @@ function RaportPdf() {
         <a href="/dashboard/rapoarte" style={{ background: 'var(--glass)', color: INK }}>← Inapoi</a>
       </div>
 
-      <div style={{ background: T1, color: 'var(--glass)', padding: '26px 14mm 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div style={{ background: T1, color: '#fff', padding: '26px 14mm 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
           <div style={{ fontFamily: 'var(--font)', fontSize: 24, fontWeight: 700 }}>Vila Iorga 4 · Apă rece</div>
           <div style={{ fontSize: 14, marginTop: 4 }}>Consum {numeLuna} · citiri apometre din 24 {LUNI[luna.luna - 1]}</div>
@@ -229,7 +229,7 @@ function GraficApartamente({ ultimele, ist, apartamente }) {
   const y = v => pt + (H - pt - pb) * (1 - v / top)
   const bw = Math.min(8, (gw - 8) / Math.max(1, apartamente.length))
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 'auto' }} fontFamily="Urbanist, system-ui, sans-serif">
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 'auto' }} fontFamily="Helvetica Neue, Helvetica, Arial, sans-serif">
       <Axe W={W} H={H} pl={pl} pb={pb} top={top} pas={pas} y={y} ultimele={ultimele} gw={gw} />
       {ultimele.map((l, i) => apartamente.map((a, k) => {
         const v = valoare(ist, l.id, a)
@@ -258,7 +258,7 @@ function GraficTotal({ ultimele, ist, apartamente }) {
   const y = v => pt + (H - pt - pb) * (1 - v / top)
   const lat = Math.min(14, gw / 3)
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 'auto' }} fontFamily="Urbanist, system-ui, sans-serif">
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 'auto' }} fontFamily="Helvetica Neue, Helvetica, Arial, sans-serif">
       <Axe W={W} H={H} pl={pl} pb={pb} top={top} pas={pas} y={y} ultimele={ultimele} gw={gw} />
       {ultimele.map((l, i) => {
         const cx = pl + gw * i + gw / 2, s = suma(l), g = Number(l.consum_facturat) || 0, d = g - s

@@ -114,7 +114,7 @@ export default function Setari() {
         <div style={{display:'flex',alignItems:'center',gap:10}}>
           <a href="/dashboard" style={{color:'rgba(255,255,255,0.8)',textDecoration:'none',fontSize:20}}>←</a>
           <div>
-            <div style={{color:'#fff',fontWeight:800,fontSize:16,fontFamily:'var(--font-display)'}}>Setari</div>
+            <div style={{color:'#fff',fontWeight:600,fontSize:16,fontFamily:'var(--font-display)'}}>Setari</div>
             <div style={{color:'rgba(255,255,255,0.7)',fontSize:11}}>Vila Iorga 4</div>
           </div>
         </div>
@@ -133,13 +133,13 @@ export default function Setari() {
 
         {/* CONTUL MEU */}
         <div style={{background:'var(--card)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
-          <div style={{fontFamily:'var(--font-display)',fontSize:14,fontWeight:700,marginBottom:4}}>Contul meu</div>
+          <div style={{fontFamily:'var(--font-display)',fontSize:14,fontWeight:500,marginBottom:4}}>Contul meu</div>
           <div style={{fontSize:12,color:'var(--text3)',marginBottom:14}}>{profile?.nume} · {email}</div>
-          <div style={{fontSize:12,fontWeight:700,color:'var(--text2)',marginBottom:8}}>Schimba parola</div>
+          <div style={{fontSize:12,fontWeight:500,color:'var(--text2)',marginBottom:8}}>Schimba parola</div>
           <input type="password" autoComplete="new-password" placeholder="Parola noua (minim 8 caractere)" value={parola.noua} onChange={e => setParola({...parola, noua: e.target.value})} style={{width:'100%',padding:'11px',border:'1px solid rgba(29,28,27,0.08)',background:'var(--glass)',borderRadius:16,fontSize:15,fontFamily:'var(--font)',outline:'none',marginBottom:10}} />
           <input type="password" autoComplete="new-password" placeholder="Repeta parola noua" value={parola.confirma} onChange={e => setParola({...parola, confirma: e.target.value})} style={{width:'100%',padding:'11px',border:'1px solid rgba(29,28,27,0.08)',background:'var(--glass)',borderRadius:16,fontSize:15,fontFamily:'var(--font)',outline:'none',marginBottom:10}} />
           {msgParola.text && <div style={{padding:'10px 12px',borderRadius:10,fontSize:12,fontWeight:600,marginBottom:10,background:msgParola.tip === 'success' ? 'var(--t7)' : 'var(--err-bg)',color:msgParola.tip === 'success' ? 'var(--t1)' : '#b91c1c'}}>{msgParola.text}</div>}
-          <button onClick={schimbaParola} disabled={saving} style={{width:'100%',padding:'12px',background:'var(--btn)',border:'none',borderRadius:12,color:'#fff',fontSize:14,fontWeight:800,cursor:'pointer'}}>
+          <button className="btn-cta" onClick={schimbaParola} disabled={saving} style={{width:'100%',padding:'12px',background:'var(--btn)',border:'none',borderRadius:12,color:'#fff',fontSize:14,fontWeight:600,cursor:'pointer'}}>
             {saving ? 'Se salveaza...' : 'Salveaza parola noua'}
           </button>
         </div>
@@ -148,28 +148,28 @@ export default function Setari() {
         {/* UTILIZATORI */}
         <div style={{background:'var(--card)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
           <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:14}}>
-            <div style={{fontFamily:'var(--font-display)',fontSize:14,fontWeight:700}}>Utilizatori si roluri</div>
-            <button onClick={() => { setModalInvite(true); setMsg('') }} style={{padding:'7px 14px',background:'var(--btn)',border:'none',borderRadius:8,color:'#fff',fontSize:12,fontWeight:700,cursor:'pointer'}}>
+            <div style={{fontFamily:'var(--font-display)',fontSize:14,fontWeight:500}}>Utilizatori si roluri</div>
+            <button onClick={() => { setModalInvite(true); setMsg('') }} style={{padding:'7px 14px',background:'var(--btn)',border:'none',borderRadius:8,color:'#fff',fontSize:12,fontWeight:500,cursor:'pointer'}}>
               + Adauga
             </button>
           </div>
           <div style={{display:'flex',flexDirection:'column',gap:8}}>
             {utilizatori.map((util, i) => (
               <div key={util.id} style={{display:'flex',alignItems:'center',gap:10,padding:'10px 12px',background:'var(--bg)',borderRadius:'var(--r-sm)'}}>
-                <div style={{width:36,height:36,borderRadius:'50%',background:rolColors[util.rol] || '#94a3b8',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontWeight:800,fontSize:12,flexShrink:0}}>
+                <div style={{width:36,height:36,borderRadius:'50%',background:rolColors[util.rol] || '#94a3b8',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontWeight:600,fontSize:12,flexShrink:0}}>
                   {util.nume.substring(0,2).toUpperCase()}
                 </div>
                 <div style={{flex:1,minWidth:0}}>
-                  <div style={{fontSize:13,fontWeight:700,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{util.nume}</div>
+                  <div style={{fontSize:13,fontWeight:500,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{util.nume}</div>
                   <div style={{fontSize:11,color:'var(--text3)'}}>{util.email}</div>
                   {util.apartamente && <div style={{fontSize:11,color:'var(--t1)',fontWeight:600}}>Ap. {util.apartamente.numar}</div>}
                 </div>
                 <div style={{display:'flex',flexDirection:'column',alignItems:'flex-end',gap:5}}>
-                  <span style={{fontSize:10,fontWeight:700,padding:'2px 8px',borderRadius:12,background:rolColors[util.rol]+'22',color:rolColors[util.rol]}}>
+                  <span style={{fontSize:10,fontWeight:500,padding:'2px 8px',borderRadius:12,background:rolColors[util.rol]+'22',color:rolColors[util.rol]}}>
                     {rolLabels[util.rol]}
                   </span>
                   {util.id !== profile?.id && (
-                    <button onClick={() => { setModalRol(util); setMsg('') }} style={{fontSize:10,fontWeight:700,padding:'3px 8px',background:'var(--surface2)',border:'1px solid var(--border)',borderRadius:8,cursor:'pointer',color:'var(--text2)'}}>
+                    <button onClick={() => { setModalRol(util); setMsg('') }} style={{fontSize:10,fontWeight:500,padding:'3px 8px',background:'var(--surface2)',border:'1px solid var(--border)',borderRadius:8,cursor:'pointer',color:'var(--text2)'}}>
                       Schimba rol
                     </button>
                   )}
@@ -181,7 +181,7 @@ export default function Setari() {
 
         {/* INFO SCHIMBARE MANAGER */}
         <div style={{background:'linear-gradient(135deg,var(--t7),var(--l7))',borderRadius:'var(--r)',padding:'14px 16px',border:'1.5px solid var(--t5)'}}>
-          <div style={{fontFamily:'var(--font-display)',fontSize:13,fontWeight:700,marginBottom:6,color:'var(--text)'}}>
+          <div style={{fontFamily:'var(--font-display)',fontSize:13,fontWeight:500,marginBottom:6,color:'var(--text)'}}>
             Cum schimbi managerul?
           </div>
           <div style={{fontSize:12,color:'var(--text2)',lineHeight:1.6}}>
@@ -194,7 +194,7 @@ export default function Setari() {
 
         {/* INFO VILA */}
         <div style={{background:'var(--card)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
-          <div style={{fontFamily:'var(--font-display)',fontSize:14,fontWeight:700,marginBottom:12}}>Informatii Vila</div>
+          <div style={{fontFamily:'var(--font-display)',fontSize:14,fontWeight:500,marginBottom:12}}>Informatii Vila</div>
           <div style={{display:'flex',flexDirection:'column',gap:8}}>
             <div style={{display:'flex',justifyContent:'space-between',padding:'10px',background:'var(--bg)',borderRadius:'var(--r-sm)'}}>
               <span style={{fontSize:12,color:'var(--text3)'}}>Denumire</span>
@@ -223,7 +223,7 @@ export default function Setari() {
         <div onClick={() => setModalInvite(false)} style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.45)',zIndex:200,display:'flex',alignItems:'flex-end',justifyContent:'center'}}>
           <div onClick={e => e.stopPropagation()} style={{background:'var(--sheet)',borderRadius:'32px 32px 0 0',padding:'24px 20px 36px',width:'100%',maxWidth:500}}>
             <div style={{width:36,height:4,background:'var(--border)',borderRadius:2,margin:'0 auto 20px'}}></div>
-            <div style={{fontFamily:'var(--font-display)',fontSize:17,fontWeight:700,marginBottom:16}}>Adauga utilizator nou</div>
+            <div style={{fontFamily:'var(--font-display)',fontSize:17,fontWeight:500,marginBottom:16}}>Adauga utilizator nou</div>
             <div style={{display:'flex',flexDirection:'column',gap:12}}>
               <div>
                 <label style={{display:'block',fontSize:12,fontWeight:600,color:'var(--text2)',marginBottom:5}}>Nume complet</label>
@@ -261,8 +261,8 @@ export default function Setari() {
             </div>
             {msg && <div style={{marginTop:10,padding:'10px',background: msgType==='success'?'var(--t7)':'var(--err-bg)',borderRadius:10,color:msgType==='success'?'var(--t1)':'#b91c1c',fontSize:13}}>{msg}</div>}
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginTop:16}}>
-              <button onClick={() => setModalInvite(false)} style={{padding:13,background:'var(--bg)',border:'none',borderRadius:12,fontSize:13,fontWeight:700,cursor:'pointer'}}>Anuleaza</button>
-              <button onClick={inviteUser} disabled={saving} style={{padding:13,background:'var(--btn)',border:'none',borderRadius:12,color:'#fff',fontSize:13,fontWeight:700,cursor:'pointer'}}>
+              <button onClick={() => setModalInvite(false)} style={{padding:13,background:'var(--bg)',border:'none',borderRadius:12,fontSize:13,fontWeight:500,cursor:'pointer'}}>Anuleaza</button>
+              <button className="btn-cta" onClick={inviteUser} disabled={saving} style={{padding:13,background:'var(--btn)',border:'none',borderRadius:12,color:'#fff',fontSize:13,fontWeight:500,cursor:'pointer'}}>
                 {saving ? 'Se creeaza...' : '+ Creeaza cont'}
               </button>
             </div>
@@ -275,7 +275,7 @@ export default function Setari() {
         <div onClick={() => setModalRol(null)} style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.45)',zIndex:200,display:'flex',alignItems:'flex-end',justifyContent:'center'}}>
           <div onClick={e => e.stopPropagation()} style={{background:'var(--sheet)',borderRadius:'32px 32px 0 0',padding:'24px 20px 36px',width:'100%',maxWidth:500}}>
             <div style={{width:36,height:4,background:'var(--border)',borderRadius:2,margin:'0 auto 20px'}}></div>
-            <div style={{fontFamily:'var(--font-display)',fontSize:17,fontWeight:700,marginBottom:4}}>Schimba rol</div>
+            <div style={{fontFamily:'var(--font-display)',fontSize:17,fontWeight:500,marginBottom:4}}>Schimba rol</div>
             <div style={{fontSize:13,color:'var(--text3)',marginBottom:16}}>{modalRol.nume}</div>
             <div style={{display:'flex',flexDirection:'column',gap:8,marginBottom:16}}>
               {['proprietar','manager','administrator'].map(rol => (
@@ -284,7 +284,7 @@ export default function Setari() {
                     padding:'12px 16px',borderRadius:10,border:`2px solid ${modalRol.rol === rol ? rolColors[rol] : 'var(--border)'}`,
                     background: modalRol.rol === rol ? rolColors[rol]+'15' : 'var(--glass)',
                     color: modalRol.rol === rol ? rolColors[rol] : 'var(--text2)',
-                    fontSize:13,fontWeight:700,cursor:'pointer',textAlign:'left',
+                    fontSize:13,fontWeight:500,cursor:'pointer',textAlign:'left',
                     display:'flex',alignItems:'center',justifyContent:'space-between'
                   }}>
                   <span>{rolLabels[rol]}</span>
@@ -292,7 +292,7 @@ export default function Setari() {
                 </button>
               ))}
             </div>
-            <button onClick={() => setModalRol(null)} style={{width:'100%',padding:13,background:'var(--bg)',border:'none',borderRadius:12,fontSize:13,fontWeight:700,cursor:'pointer'}}>Inchide</button>
+            <button onClick={() => setModalRol(null)} style={{width:'100%',padding:13,background:'var(--bg)',border:'none',borderRadius:12,fontSize:13,fontWeight:500,cursor:'pointer'}}>Inchide</button>
           </div>
         </div>
       )}
@@ -301,7 +301,7 @@ export default function Setari() {
         {[{icon:'📊',label:'Dashboard',href:'/dashboard'},{icon:'🔢',label:'Citiri',href:'/dashboard/citiri'},{icon:'💳',label:'Plati',href:'/dashboard/plati'},{icon:'📈',label:'Grafice',href:'/dashboard/grafice'},{icon:'⚙️',label:'Setari',href:'/dashboard/setari'}].map(item => (
           <a key={item.href} href={item.href} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:3,textDecoration:'none',minWidth:56}}>
             <span style={{fontSize:20}}>{item.icon}</span>
-            <span style={{fontSize:10,fontWeight:700,color:item.href==='/dashboard/setari'?'var(--t1)':'var(--text3)'}}>{item.label}</span>
+            <span style={{fontSize:10,fontWeight:500,color:item.href==='/dashboard/setari'?'var(--t1)':'var(--text3)'}}>{item.label}</span>
           </a>
         ))}
       </div>

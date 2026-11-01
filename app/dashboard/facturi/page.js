@@ -122,11 +122,11 @@ export default function Facturi() {
         <div style={{display:'flex',alignItems:'center',gap:10}}>
           <a href="/dashboard" style={{color:'rgba(255,255,255,0.8)',textDecoration:'none',fontSize:20}}>←</a>
           <div>
-            <div style={{color:'#fff',fontWeight:800,fontSize:16,fontFamily:'var(--font-display)'}}>Facturi lunare</div>
+            <div style={{color:'#fff',fontWeight:600,fontSize:16,fontFamily:'var(--font-display)'}}>Facturi lunare</div>
             <div style={{color:'rgba(255,255,255,0.7)',fontSize:11}}>{lunaActuala ? `${LUNI_NUME[lunaActuala.luna]} ${lunaActuala.an}` : ''}</div>
           </div>
         </div>
-        <button onClick={adaugaLunaNou} style={{padding:'7px 12px',background:'rgba(255,255,255,0.2)',border:'none',borderRadius:8,color:'#fff',fontSize:12,fontWeight:700,cursor:'pointer'}}>
+        <button onClick={adaugaLunaNou} style={{padding:'7px 12px',background:'rgba(255,255,255,0.2)',border:'none',borderRadius:8,color:'#fff',fontSize:12,fontWeight:500,cursor:'pointer'}}>
           + Luna noua
         </button>
       </div>
@@ -143,7 +143,7 @@ export default function Facturi() {
 
         {lunaActuala && (
           <div style={{background:'var(--card)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
-            <div style={{fontFamily:'var(--font-display)',fontSize:14,fontWeight:700,marginBottom:14}}>
+            <div style={{fontFamily:'var(--font-display)',fontSize:14,fontWeight:500,marginBottom:14}}>
               Factura {LUNI_NUME[lunaActuala.luna]} {lunaActuala.an}
             </div>
 
@@ -152,7 +152,7 @@ export default function Facturi() {
                 <label style={{display:'block',fontSize:12,fontWeight:600,color:'var(--text2)',marginBottom:5}}>Valoare factura (RON)</label>
                 <input type="number" step="0.01" value={form.valoare_factura}
                   onChange={e => setForm({...form, valoare_factura: e.target.value})}
-                  style={{width:'100%',padding:'11px',border:'1px solid rgba(29,28,27,0.08)',background:'var(--glass)',borderRadius:16,fontSize:15,fontFamily:'var(--font)',outline:'none',fontWeight:700}}
+                  style={{width:'100%',padding:'11px',border:'1px solid rgba(29,28,27,0.08)',background:'var(--glass)',borderRadius:16,fontSize:15,fontFamily:'var(--font)',outline:'none',fontWeight:500}}
                   placeholder="0.00"
                 />
               </div>
@@ -160,7 +160,7 @@ export default function Facturi() {
                 <label style={{display:'block',fontSize:12,fontWeight:600,color:'var(--text2)',marginBottom:5}}>Consum facturat RAGCL (mc)</label>
                 <input type="number" step="0.001" value={form.consum_facturat}
                   onChange={e => setForm({...form, consum_facturat: e.target.value})}
-                  style={{width:'100%',padding:'11px',border:'1px solid rgba(29,28,27,0.08)',background:'var(--glass)',borderRadius:16,fontSize:15,fontFamily:'var(--font)',outline:'none',fontWeight:700}}
+                  style={{width:'100%',padding:'11px',border:'1px solid rgba(29,28,27,0.08)',background:'var(--glass)',borderRadius:16,fontSize:15,fontFamily:'var(--font)',outline:'none',fontWeight:500}}
                   placeholder="0.000"
                 />
               </div>
@@ -208,12 +208,12 @@ export default function Facturi() {
               <label style={labelStil}>Folder Drive cu poze si aviz (ID sau link)</label>
               <div style={{display:'flex',gap:8}}>
                 <input value={form.drive_folder_id} onChange={e => { const v = e.target.value; const m = v.match(/folders\/([\w-]+)/); setForm({...form, drive_folder_id: m ? m[1] : v}) }} style={{...inputStil,flex:1,fontSize:12}} placeholder="lipeste linkul folderului din Drive" />
-                {form.drive_folder_id && <a href={driveUrl(form.drive_folder_id)} target="_blank" rel="noreferrer" style={{padding:'10px 12px',borderRadius:10,background:'var(--l7)',color:'var(--l1)',fontSize:12,fontWeight:700,textDecoration:'none',whiteSpace:'nowrap'}}>📁 Deschide</a>}
+                {form.drive_folder_id && <a href={driveUrl(form.drive_folder_id)} target="_blank" rel="noreferrer" style={{padding:'10px 12px',borderRadius:10,background:'var(--l7)',color:'var(--l1)',fontSize:12,fontWeight:500,textDecoration:'none',whiteSpace:'nowrap'}}>📁 Deschide</a>}
               </div>
             </div>
 
             <details style={{marginBottom:12,padding:'10px 12px',background:'var(--bg)',borderRadius:10}}>
-              <summary style={{fontSize:12,fontWeight:700,color:'var(--text2)',cursor:'pointer'}}>Diferente fata de calculul vechi (Corina)</summary>
+              <summary style={{fontSize:12,fontWeight:500,color:'var(--text2)',cursor:'pointer'}}>Diferente fata de calculul vechi (Corina)</summary>
               <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginTop:10}}>
                 <div>
                   <label style={labelStil}>Diferenta mc</label>
@@ -242,7 +242,7 @@ export default function Facturi() {
                       background: form.mod_repartizare === opt.val ? 'var(--t7)' : 'var(--glass)',
                       color: form.mod_repartizare === opt.val ? 'var(--t1)' : 'var(--text3)'
                     }}>
-                    <div style={{fontSize:11,fontWeight:700}}>{opt.label}</div>
+                    <div style={{fontSize:11,fontWeight:500}}>{opt.label}</div>
                     <div style={{fontSize:10,marginTop:2}}>{opt.desc}</div>
                   </button>
                 ))}
@@ -261,7 +261,7 @@ export default function Facturi() {
               const v = !lunaActuala.validata
               const { error } = await supabase.from('luni_facturare').update({ validata: v, validata_la: v ? new Date().toISOString() : null }).eq('id', lunaActuala.id)
               if (error) { setMsg('Eroare: ' + error.message); setMsgType('error') } else { setMsg(v ? 'Luna validata: citirile sunt blocate pentru proprietari.' : 'Luna deblocata: proprietarii pot corecta citirile.'); setMsgType('success'); await loadData() }
-            }} style={{width:'100%',padding:'11px',marginBottom:10,background:lunaActuala.validata ? 'var(--l7)' : 'var(--glass)',border:`1.5px solid ${lunaActuala.validata ? 'var(--l4)' : 'var(--border)'}`,borderRadius:12,color:'var(--l1)',fontSize:13,fontWeight:700,cursor:'pointer'}}>
+            }} style={{width:'100%',padding:'11px',marginBottom:10,background:lunaActuala.validata ? 'var(--l7)' : 'var(--glass)',border:`1.5px solid ${lunaActuala.validata ? 'var(--l4)' : 'var(--border)'}`,borderRadius:12,color:'var(--l1)',fontSize:13,fontWeight:500,cursor:'pointer'}}>
               {lunaActuala.validata ? '🔒 Luna validata (apasa ca sa deblochezi citirile)' : '🔓 Valideaza luna (blocheaza citirile proprietarilor)'}
             </button>
 
@@ -277,22 +277,22 @@ export default function Facturi() {
                 if (j.ok) ok++; else err = j.error || r.statusText
               }
               setMsg(ok === cuPoza.length ? `Gata: ${ok} poze salvate in Drive.` : `${ok} din ${cuPoza.length} poze salvate. Eroare: ${err}`); setMsgType(ok === cuPoza.length ? 'success' : 'error'); await loadData()
-            }} style={{width:'100%',padding:'11px',marginBottom:10,background:'var(--glass)',border:'1.5px solid var(--border)',borderRadius:12,color:'var(--text2)',fontSize:13,fontWeight:700,cursor:'pointer'}}>
+            }} style={{width:'100%',padding:'11px',marginBottom:10,background:'var(--glass)',border:'1.5px solid var(--border)',borderRadius:12,color:'var(--text2)',fontSize:13,fontWeight:500,cursor:'pointer'}}>
               📁 Trimite pozele lunii in Drive
             </button>
 
-            <button onClick={salveazaFactura} disabled={saving} style={{
+            <button className="btn-cta" onClick={salveazaFactura} disabled={saving} style={{
               width:'100%',padding:'13px',
               background:'var(--btn)',
-              border:'none',borderRadius:12,color:'#fff',fontSize:14,fontWeight:800,cursor:'pointer'
+              border:'none',borderRadius:12,color:'#fff',fontSize:14,fontWeight:600,cursor:'pointer'
             }}>
-              {saving ? 'Se salveaza...' : '💾 Salveaza factura'}
+              {saving ? 'Se salveaza...' : 'Salveaza factura'}
             </button>
           </div>
         )}
 
         <div style={{background:'var(--card)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
-          <div style={{fontFamily:'var(--font-display)',fontSize:14,fontWeight:700,marginBottom:12}}>Istoric facturi</div>
+          <div style={{fontFamily:'var(--font-display)',fontSize:14,fontWeight:500,marginBottom:12}}>Istoric facturi</div>
           <div style={{display:'flex',flexDirection:'column',gap:6}}>
             {luni.map(luna => (
               <div key={luna.id} onClick={() => { selecteaza(luna); window.scrollTo(0,0) }}
@@ -303,11 +303,11 @@ export default function Facturi() {
                   border: `1px solid ${lunaActuala?.id === luna.id ? 'var(--t4)' : 'transparent'}`
                 }}>
                 <div style={{flex:1}}>
-                  <div style={{fontSize:13,fontWeight:700,color:'var(--text)'}}>{LUNI_NUME[luna.luna]} {luna.an}{luna.valoare_estimata ? ' · estimat' : ''}{luna.dif_corina_ron ? ` · dif. ${fmt(luna.dif_corina_ron)} RON` : ''}</div>
+                  <div style={{fontSize:13,fontWeight:500,color:'var(--text)'}}>{LUNI_NUME[luna.luna]} {luna.an}{luna.valoare_estimata ? ' · estimat' : ''}{luna.dif_corina_ron ? ` · dif. ${fmt(luna.dif_corina_ron)} RON` : ''}</div>
                   <div style={{fontSize:11,color:'var(--text3)'}}>{luna.consum_facturat} mc · {luna.pret_per_mc?.toFixed(2)} RON/mc</div>
                 </div>
                 <div style={{textAlign:'right'}}>
-                  <div style={{fontSize:13,fontWeight:800,color:'var(--l2)'}}>{luna.valoare_factura?.toFixed(2)} RON</div>
+                  <div style={{fontSize:13,fontWeight:600,color:'var(--l2)'}}>{luna.valoare_factura?.toFixed(2)} RON</div>
                   <div style={{fontSize:10,color:'var(--text3)',textTransform:'capitalize'}}>{luna.mod_repartizare}</div>
                 </div>
                 {lunaActuala?.id === luna.id && <span style={{fontSize:12,color:'var(--t1)'}}>✓</span>}
@@ -322,7 +322,7 @@ export default function Facturi() {
         {[{icon:'📊',label:'Dashboard',href:'/dashboard'},{icon:'🔢',label:'Citiri',href:'/dashboard/citiri'},{icon:'💳',label:'Plati',href:'/dashboard/plati'},{icon:'📈',label:'Grafice',href:'/dashboard/grafice'},{icon:'⚙️',label:'Setari',href:'/dashboard/setari'}].map(item => (
           <a key={item.href} href={item.href} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:3,textDecoration:'none',minWidth:56}}>
             <span style={{fontSize:20}}>{item.icon}</span>
-            <span style={{fontSize:10,fontWeight:700,color:'var(--text3)'}}>{item.label}</span>
+            <span style={{fontSize:10,fontWeight:500,color:'var(--text3)'}}>{item.label}</span>
           </a>
         ))}
       </div>

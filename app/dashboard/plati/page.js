@@ -98,7 +98,7 @@ export default function Plati() {
         <div style={{display:'flex',alignItems:'center',gap:10}}>
           <a href="/dashboard" style={{color:'rgba(255,255,255,0.8)',textDecoration:'none',fontSize:20}}>←</a>
           <div>
-            <div style={{color:'#fff',fontWeight:800,fontSize:16,fontFamily:'var(--font-display)'}}>Plati si Solduri</div>
+            <div style={{color:'#fff',fontWeight:600,fontSize:16,fontFamily:'var(--font-display)'}}>Plati si Solduri</div>
             <div style={{color:'rgba(255,255,255,0.7)',fontSize:11}}>{lunaNume}</div>
           </div>
         </div>
@@ -109,24 +109,24 @@ export default function Plati() {
 
         <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10}}>
           <div style={{background:'var(--card)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderRadius:'var(--r)',padding:'14px',boxShadow:'var(--shadow)',border:'1px solid var(--border)',textAlign:'center'}}>
-            <div style={{fontSize:10,color:'var(--text3)',fontWeight:700,textTransform:'uppercase',marginBottom:6}}>Total</div>
-            <div style={{fontSize:18,fontWeight:800,color:'var(--text)',fontFamily:'var(--font-display)'}}>{totalCalc.toFixed(0)}</div>
+            <div style={{fontSize:10,color:'var(--text3)',fontWeight:500,textTransform:'uppercase',marginBottom:6}}>Total</div>
+            <div style={{fontSize:18,fontWeight:600,color:'var(--text)',fontFamily:'var(--font-display)'}}>{totalCalc.toFixed(0)}</div>
             <div style={{fontSize:10,color:'var(--text3)'}}>RON</div>
           </div>
           <div style={{background:'var(--card)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderRadius:'var(--r)',padding:'14px',boxShadow:'var(--shadow)',border:'1px solid var(--border)',textAlign:'center'}}>
-            <div style={{fontSize:10,color:'var(--text3)',fontWeight:700,textTransform:'uppercase',marginBottom:6}}>Colectat</div>
-            <div style={{fontSize:18,fontWeight:800,color:'var(--t1)',fontFamily:'var(--font-display)'}}>{totalPlatit.toFixed(0)}</div>
+            <div style={{fontSize:10,color:'var(--text3)',fontWeight:500,textTransform:'uppercase',marginBottom:6}}>Colectat</div>
+            <div style={{fontSize:18,fontWeight:600,color:'var(--t1)',fontFamily:'var(--font-display)'}}>{totalPlatit.toFixed(0)}</div>
             <div style={{fontSize:10,color:'var(--text3)'}}>RON</div>
           </div>
           <div style={{background:'var(--card)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderRadius:'var(--r)',padding:'14px',boxShadow:'var(--shadow)',border:'1px solid var(--border)',textAlign:'center'}}>
-            <div style={{fontSize:10,color:'var(--text3)',fontWeight:700,textTransform:'uppercase',marginBottom:6}}>Restant</div>
-            <div style={{fontSize:18,fontWeight:800,color:totalRest>0?'#f97316':'var(--t1)',fontFamily:'var(--font-display)'}}>{totalRest.toFixed(0)}</div>
+            <div style={{fontSize:10,color:'var(--text3)',fontWeight:500,textTransform:'uppercase',marginBottom:6}}>Restant</div>
+            <div style={{fontSize:18,fontWeight:600,color:totalRest>0?'#f97316':'var(--t1)',fontFamily:'var(--font-display)'}}>{totalRest.toFixed(0)}</div>
             <div style={{fontSize:10,color:'var(--text3)'}}>RON</div>
           </div>
         </div>
 
         <div style={{background:'var(--card)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
-          <div style={{fontFamily:'var(--font-display)',fontSize:14,fontWeight:700,marginBottom:12}}>Plati {lunaNume}</div>
+          <div style={{fontFamily:'var(--font-display)',fontSize:14,fontWeight:500,marginBottom:12}}>Plati {lunaNume}</div>
           <div style={{display:'flex',flexDirection:'column',gap:10}}>
             {calcule.length === 0 ? (
               <div style={{textAlign:'center',color:'var(--text3)',padding:'20px 0',fontSize:13}}>Nu exista calcule. Introduceti citirile mai intai.</div>
@@ -153,17 +153,17 @@ export default function Plati() {
               return (
                 <div key={calc.id} style={{padding:'14px',background:'var(--bg)',borderRadius:'var(--r-sm)',borderLeft:`3px solid ${cs.border}`}}>
                   <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:10}}>
-                    <div style={{width:36,height:36,borderRadius:'50%',background:CULORI[i%5],display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontWeight:800,fontSize:12,flexShrink:0}}>
+                    <div style={{width:36,height:36,borderRadius:'50%',background:CULORI[i%5],display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontWeight:600,fontSize:12,flexShrink:0}}>
                       {calc.apartamente.proprietar_nume.substring(0,2).toUpperCase()}
                     </div>
                     <div style={{flex:1}}>
-                      <div style={{fontSize:13,fontWeight:700}}>{calc.apartamente.proprietar_nume}</div>
+                      <div style={{fontSize:13,fontWeight:500}}>{calc.apartamente.proprietar_nume}</div>
                       <div style={{fontSize:11,color:'var(--text3)'}}>Ap. {calc.apartamente.numar}</div>
                     </div>
                     <div style={{textAlign:'right'}}>
-                      <div style={{fontSize:16,fontWeight:800,color:cs.text,fontFamily:'var(--font-display)'}}>{datorat.toFixed(2)} RON</div>
+                      <div style={{fontSize:16,fontWeight:600,color:cs.text,fontFamily:'var(--font-display)'}}>{datorat.toFixed(2)} RON</div>
                       {sold !== 0 && <div style={{fontSize:10,color:'var(--text3)'}}>luna {Number(calc.suma_calculata).toFixed(2)} {sold < 0 ? `− avans ${(-sold).toFixed(2)}` : `+ restanta ${sold.toFixed(2)}`}</div>}
-                      <div style={{fontSize:10,fontWeight:700,color:cs.text}}>{cs.label}</div>
+                      <div style={{fontSize:10,fontWeight:500,color:cs.text}}>{cs.label}</div>
                     </div>
                   </div>
 
@@ -171,18 +171,18 @@ export default function Plati() {
                   <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:6,marginBottom:10}}>
                     <div style={{padding:'8px',background:'var(--glass)',borderRadius:8,textAlign:'center',border:'1px solid var(--border)'}}>
                       <div style={{fontSize:9,color:'var(--text3)',fontWeight:600,marginBottom:2}}>Consum propriu</div>
-                      <div style={{fontSize:11,fontWeight:800,color:'var(--t1)'}}>{consumPropriu.toFixed(2)} mc</div>
-                      <div style={{fontSize:10,fontWeight:700,color:'var(--text2)'}}>{sumaConsum.toFixed(2)} RON</div>
+                      <div style={{fontSize:11,fontWeight:600,color:'var(--t1)'}}>{consumPropriu.toFixed(2)} mc</div>
+                      <div style={{fontSize:10,fontWeight:500,color:'var(--text2)'}}>{sumaConsum.toFixed(2)} RON</div>
                     </div>
                     <div style={{padding:'8px',background:'var(--warn-bg)',borderRadius:8,textAlign:'center',border:'1px solid #fed7aa'}}>
                       <div style={{fontSize:9,color:'#b45309',fontWeight:600,marginBottom:2}}>Ajustare</div>
-                      <div style={{fontSize:11,fontWeight:800,color:'#f97316'}}>{pierdereRepartizata.toFixed(2)} mc</div>
-                      <div style={{fontSize:10,fontWeight:700,color:'#f97316'}}>{sumaPierdere.toFixed(2)} RON</div>
+                      <div style={{fontSize:11,fontWeight:600,color:'#f97316'}}>{pierdereRepartizata.toFixed(2)} mc</div>
+                      <div style={{fontSize:10,fontWeight:500,color:'#f97316'}}>{sumaPierdere.toFixed(2)} RON</div>
                     </div>
                     <div style={{padding:'8px',background:cs.bg,borderRadius:8,textAlign:'center',border:`1px solid ${cs.border}`}}>
                       <div style={{fontSize:9,color:'var(--text3)',fontWeight:600,marginBottom:2}}>Total</div>
-                      <div style={{fontSize:11,fontWeight:800,color:cs.text}}>{calc.mc_de_plata?.toFixed(2)} mc</div>
-                      <div style={{fontSize:10,fontWeight:700,color:cs.text}}>{calc.suma_calculata?.toFixed(2)} RON</div>
+                      <div style={{fontSize:11,fontWeight:600,color:cs.text}}>{calc.mc_de_plata?.toFixed(2)} mc</div>
+                      <div style={{fontSize:10,fontWeight:500,color:cs.text}}>{calc.suma_calculata?.toFixed(2)} RON</div>
                     </div>
                   </div>
 
@@ -199,7 +199,7 @@ export default function Plati() {
                       background:status==='platit'?'var(--surface2)':'var(--btn)',
                       border:'none',borderRadius:8,
                       color:status==='platit'?'var(--text2)':'#fff',
-                      fontSize:12,fontWeight:700,cursor:'pointer'
+                      fontSize:12,fontWeight:500,cursor:'pointer'
                     }}>
                       {status==='platit'?'✏️ Modifica plata':'💳 Inregistreaza plata'}
                     </button>
@@ -216,23 +216,23 @@ export default function Plati() {
         <div onClick={() => setModal(null)} style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.45)',zIndex:200,display:'flex',alignItems:'flex-end',justifyContent:'center'}}>
           <div onClick={e => e.stopPropagation()} style={{background:'var(--sheet)',borderRadius:'32px 32px 0 0',padding:'24px 20px 36px',width:'100%',maxWidth:500}}>
             <div style={{width:36,height:4,background:'var(--border)',borderRadius:2,margin:'0 auto 20px'}}></div>
-            <div style={{fontFamily:'var(--font-display)',fontSize:17,fontWeight:700,marginBottom:4}}>Inregistreaza plata</div>
+            <div style={{fontFamily:'var(--font-display)',fontSize:17,fontWeight:500,marginBottom:4}}>Inregistreaza plata</div>
             <div style={{fontSize:13,color:'var(--text3)',marginBottom:14}}>{modal.apartamente.proprietar_nume} · Ap. {modal.apartamente.numar}</div>
 
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8,marginBottom:14}}>
               <div style={{padding:'10px',background:'var(--t7)',borderRadius:10,textAlign:'center',border:'1px solid var(--t5)'}}>
                 <div style={{fontSize:9,color:'var(--text3)',marginBottom:2}}>Consum</div>
-                <div style={{fontSize:12,fontWeight:800,color:'var(--t1)'}}>{((modal.consum_individual||0)*pretPerMc).toFixed(2)}</div>
+                <div style={{fontSize:12,fontWeight:600,color:'var(--t1)'}}>{((modal.consum_individual||0)*pretPerMc).toFixed(2)}</div>
                 <div style={{fontSize:9,color:'var(--text3)'}}>RON</div>
               </div>
               <div style={{padding:'10px',background:'var(--warn-bg)',borderRadius:10,textAlign:'center',border:'1px solid #fed7aa'}}>
                 <div style={{fontSize:9,color:'#b45309',marginBottom:2}}>Ajustare</div>
-                <div style={{fontSize:12,fontWeight:800,color:'#f97316'}}>{((modal.pierdere_repartizata||0)*pretPerMc).toFixed(2)}</div>
+                <div style={{fontSize:12,fontWeight:600,color:'#f97316'}}>{((modal.pierdere_repartizata||0)*pretPerMc).toFixed(2)}</div>
                 <div style={{fontSize:9,color:'var(--text3)'}}>RON</div>
               </div>
               <div style={{padding:'10px',background:'var(--l7)',borderRadius:10,textAlign:'center',border:'1px solid var(--l5)'}}>
                 <div style={{fontSize:9,color:'var(--text3)',marginBottom:2}}>Total</div>
-                <div style={{fontSize:12,fontWeight:800,color:'var(--l2)'}}>{totalDePlata(modal).toFixed(2)}</div>
+                <div style={{fontSize:12,fontWeight:600,color:'var(--l2)'}}>{totalDePlata(modal).toFixed(2)}</div>
                 <div style={{fontSize:9,color:'var(--text3)'}}>RON</div>
               </div>
             </div>
@@ -240,21 +240,21 @@ export default function Plati() {
             <div style={{marginBottom:12}}>
               <label style={{display:'block',fontSize:12,fontWeight:600,color:'var(--text2)',marginBottom:5}}>Suma platita (RON)</label>
               <input type="number" step="0.01" value={suma} onChange={e => setSuma(e.target.value)}
-                style={{width:'100%',padding:'13px',border:'1px solid rgba(29,28,27,0.08)',background:'var(--glass)',borderRadius:16,fontSize:18,fontFamily:'var(--font)',outline:'none',fontWeight:700}}
+                style={{width:'100%',padding:'13px',border:'1px solid rgba(29,28,27,0.08)',background:'var(--glass)',borderRadius:16,fontSize:18,fontFamily:'var(--font)',outline:'none',fontWeight:500}}
                 placeholder="0.00"
               />
             </div>
             <button onClick={() => setSuma(totalDePlata(modal).toFixed(2))} style={{
               width:'100%',padding:'9px',background:'var(--t6)',border:'1.5px solid var(--t4)',
-              borderRadius:8,fontSize:12,fontWeight:700,color:'var(--t1)',cursor:'pointer',marginBottom:12
+              borderRadius:8,fontSize:12,fontWeight:500,color:'var(--t1)',cursor:'pointer',marginBottom:12
             }}>
               Plateste integral: {totalDePlata(modal).toFixed(2)} RON
             </button>
 
             {msg && <div style={{padding:'10px',background:'var(--err-bg)',borderRadius:10,color:'#b91c1c',fontSize:13,marginBottom:12}}>{msg}</div>}
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
-              <button onClick={() => setModal(null)} style={{padding:13,background:'var(--bg)',border:'none',borderRadius:12,fontSize:13,fontWeight:700,cursor:'pointer'}}>Anuleaza</button>
-              <button onClick={savePlata} disabled={saving} style={{padding:13,background:'var(--btn)',border:'none',borderRadius:12,color:'#fff',fontSize:13,fontWeight:700,cursor:'pointer'}}>
+              <button onClick={() => setModal(null)} style={{padding:13,background:'var(--bg)',border:'none',borderRadius:12,fontSize:13,fontWeight:500,cursor:'pointer'}}>Anuleaza</button>
+              <button className="btn-cta" onClick={savePlata} disabled={saving} style={{padding:13,background:'var(--btn)',border:'none',borderRadius:12,color:'#fff',fontSize:13,fontWeight:500,cursor:'pointer'}}>
                 {saving?'Se salveaza...':'✅ Confirma plata'}
               </button>
             </div>
@@ -266,7 +266,7 @@ export default function Plati() {
         {[{icon:'📊',label:'Dashboard',href:'/dashboard'},{icon:'🔢',label:'Citiri',href:'/dashboard/citiri'},{icon:'💳',label:'Plati',href:'/dashboard/plati'},{icon:'📈',label:'Grafice',href:'/dashboard/grafice'},{icon:'⚙️',label:'Setari',href:'/dashboard/setari'}].map(item => (
           <a key={item.href} href={item.href} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:3,textDecoration:'none',minWidth:56}}>
             <span style={{fontSize:20}}>{item.icon}</span>
-            <span style={{fontSize:10,fontWeight:700,color:item.href==='/dashboard/plati'?'var(--t1)':'var(--text3)'}}>{item.label}</span>
+            <span style={{fontSize:10,fontWeight:500,color:item.href==='/dashboard/plati'?'var(--t1)':'var(--text3)'}}>{item.label}</span>
           </a>
         ))}
       </div>
