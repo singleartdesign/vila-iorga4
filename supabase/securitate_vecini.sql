@@ -31,3 +31,9 @@ alter table citiri add column if not exists poza_path text;
 create policy "Toti vad pozele citirilor" on storage.objects for select to authenticated using (bucket_id = 'citiri-poze');
 create policy "Admin gestioneaza pozele citirilor" on storage.objects for all to authenticated using (bucket_id = 'citiri-poze' and get_rol() = any (array['administrator','manager'])) with check (bucket_id = 'citiri-poze' and get_rol() = any (array['administrator','manager']));
 create policy "Proprietarul incarca poza lui" on storage.objects for insert to authenticated with check (bucket_id = 'citiri-poze' and (storage.foldername(name))[2] = get_apartament()::text and e_luna_deschisa(((storage.foldername(name))[1])::integer));
+
+-- 2026-11-01: poze de profil + protectie rol
+alter table public.profiles add column if not exists avatar_url text;
+-- trigger protejeaza_profil: doar administratorul poate schimba rol / apartament / email
+-- functia avatare() (security definer): vecinii vad pozele celorlalti
+-- bucket public 'avatare', fiecare scrie doar in folderul {auth.uid()}/

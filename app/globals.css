@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Questrial&display=swap');
+
 :root {
   /* accent: de la turcoaz la bleumarin */
   --t1: #0b2545; --t2: #1a9fb0; --t3: #3fc1c9; --t4: #8fdde0;
@@ -24,8 +26,8 @@
   --r: 30px; --r-sm: 20px;
   --btn: #0b2545;
   --hdr: radial-gradient(120% 170% at 90% -20%, rgba(63,193,201,0.55) 0%, rgba(63,193,201,0) 55%), rgba(11,37,69,0.80);
-  --font: 'Helvetica Neue', Helvetica, Arial, system-ui, sans-serif;
-  --font-display: 'Helvetica Neue', Helvetica, Arial, system-ui, sans-serif;
+  --font: 'Questrial', 'Helvetica Neue', Helvetica, Arial, system-ui, sans-serif;
+  --font-display: 'Questrial', 'Helvetica Neue', Helvetica, Arial, system-ui, sans-serif;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }

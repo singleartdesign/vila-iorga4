@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase'
 import Icon from '@/lib/Icon'
+import Avatar from '@/lib/Avatar'
 import { useRouter } from 'next/navigation'
 import { sumaApometreCorectata } from '@/lib/verificari'
 
@@ -133,6 +134,7 @@ export default function Dashboard() {
   const [citiriIst, setCitiriIst] = useState([])
   const [apartamente, setApartamente] = useState([])
   const [loading, setLoading] = useState(true)
+  const [avatare, setAvatare] = useState({})
   const router = useRouter()
   const supabase = createClient()
 
@@ -143,6 +145,9 @@ export default function Dashboard() {
     if (!user) { router.push('/login'); return }
     const { data: prof } = await supabase.from('profiles').select('*').eq('id', user.id).single()
     setProfile(prof)
+    supabase.rpc('avatare').then(({ data }) => {
+      const m = {}; (data || []).forEach(a => { if (a.apartament_id && !m[a.apartament_id]) m[a.apartament_id] = a.avatar_url }); setAvatare(m)
+    })
     const { data: luni } = await supabase.from('luni_facturare').select('*').order('an',{ascending:false}).order('luna',{ascending:false}).limit(12)
     if (luni && luni.length > 0) {
       const luniRev = [...luni].reverse()
@@ -195,11 +200,12 @@ export default function Dashboard() {
           </div>
         </div>
         <div style={{display:'flex',alignItems:'center',gap:10}}>
+          <a href="/dashboard/setari" title="Contul meu" style={{textDecoration:'none'}}><Avatar url={profile?.avatar_url} nume={profile?.nume} size={34} color={CULORI[((profile?.apartament_id||4)-1)%5]} style={{boxShadow:'0 0 0 2px rgba(255,255,255,0.5)'}} /></a>
           <div style={{textAlign:'right'}}>
             <div style={{color:'#fff',fontSize:13,fontWeight:500}}>{profile?.nume}</div>
             <div style={{color:'rgba(255,255,255,0.6)',fontSize:10,textTransform:'capitalize'}}>{profile?.rol}</div>
           </div>
-          <button onClick={handleLogout} style={{padding:'6px 12px',background:'rgba(255,255,255,0.2)',border:'none',borderRadius:8,color:'#fff',cursor:'pointer',fontSize:12,fontWeight:600}}>Iesi</button>
+          <button onClick={handleLogout} style={{padding:'6px 12px',background:'rgba(255,255,255,0.16)',border:'1px solid rgba(255,255,255,0.25)',borderRadius:8,color:'#fff',cursor:'pointer',fontSize:12,fontWeight:500}}>Iesi</button>
         </div>
       </div>
 
@@ -264,9 +270,7 @@ export default function Dashboard() {
               const c = {platit:{border:'var(--t2)',text:'var(--t1)',label:'Platit'},partial:{border:'var(--l4)',text:'var(--l2)',label:'Partial'},neplatit:{border:'#fed7aa',text:'#f97316',label:'Neplatit'},asteapta:{border:'var(--border)',text:'var(--text3)',label:'Asteapta factura'}}[status]
               return (
                 <div key={calc.id} style={{display:'flex',alignItems:'center',gap:10,padding:'10px 12px',background:'var(--bg)',borderRadius:'var(--r-sm)',borderLeft:`3px solid ${c.border}`}}>
-                  <div style={{width:34,height:34,borderRadius:'50%',background:CULORI[i%5],display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontWeight:600,fontSize:12,flexShrink:0}}>
-                    {calc.apartamente.proprietar_nume.substring(0,2).toUpperCase()}
-                  </div>
+                  <Avatar url={avatare[calc.apartament_id]} nume={calc.apartamente.proprietar_nume} size={38} color={CULORI[i%5]} />
                   <div style={{flex:1,minWidth:0}}>
                     <div style={{fontSize:13,fontWeight:500,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{calc.apartamente.proprietar_nume}</div>
                     <div style={{fontSize:11,color:'var(--text3)'}}>Ap. {calc.apartamente.numar} · {Number(calc.consum_individual).toFixed(2)} mc{Number(lunaActuala?.consum_facturat) > 0 && Math.abs(Number(calc.pierdere_repartizata)) > 0.005 && <> · ajustare <span style={{color:'#f97316'}}>{Number(calc.pierdere_repartizata) > 0 ? '+' : '−'}{Math.abs(Number(calc.pierdere_repartizata)).toFixed(2)} mc</span></>}</div>

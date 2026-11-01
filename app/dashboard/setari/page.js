@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
 import Icon from '@/lib/Icon'
+import Avatar, { pregatesteAvatar } from '@/lib/Avatar'
 import { useRouter } from 'next/navigation'
 
 const CULORI = ['#0f8b8d','#7a5cc4','#e08a3c','#9aa5ad','#3d7fd1']
@@ -20,6 +21,8 @@ export default function Setari() {
   const [email, setEmail] = useState('')
   const [parola, setParola] = useState({ noua: '', confirma: '' })
   const [msgParola, setMsgParola] = useState({ text: '', tip: 'error' })
+  const [msgPoza, setMsgPoza] = useState({ text: '', tip: 'error' })
+  const [incarcPoza, setIncarcPoza] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
@@ -47,6 +50,46 @@ export default function Setari() {
     if (error) setMsgParola({ text: 'Eroare: ' + error.message, tip: 'error' })
     else { setMsgParola({ text: 'Parola a fost schimbata. Data viitoare te loghezi cu parola noua.', tip: 'success' }); setParola({ noua: '', confirma: '' }) }
     setSaving(false)
+  }
+
+  function caleAvatar(url) {
+    const i = url ? url.indexOf('/avatare/') : -1
+    return i >= 0 ? url.slice(i + 9).split('?')[0] : null
+  }
+
+  async function incarcaPoza(e) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file || !profile) return
+    setIncarcPoza(true); setMsgPoza({ text: '', tip: 'error' })
+    try {
+      const blob = await pregatesteAvatar(file)
+      const cale = `${profile.id}/${Date.now()}.jpg`
+      const { error: errUp } = await supabase.storage.from('avatare').upload(cale, blob, { contentType: 'image/jpeg' })
+      if (errUp) throw errUp
+      const { data: { publicUrl } } = supabase.storage.from('avatare').getPublicUrl(cale)
+      const vechi = caleAvatar(profile.avatar_url)
+      const { error: errUpd } = await supabase.from('profiles').update({ avatar_url: publicUrl, actualizat_la: new Date().toISOString() }).eq('id', profile.id)
+      if (errUpd) throw errUpd
+      if (vechi) await supabase.storage.from('avatare').remove([vechi])
+      setProfile({ ...profile, avatar_url: publicUrl })
+      setUtilizatori(u => u.map(x => x.id === profile.id ? { ...x, avatar_url: publicUrl } : x))
+      setMsgPoza({ text: 'Poza a fost salvata.', tip: 'success' })
+    } catch (err) {
+      setMsgPoza({ text: 'Nu am putut salva poza: ' + (err.message || err), tip: 'error' })
+    }
+    setIncarcPoza(false)
+  }
+
+  async function stergePoza() {
+    if (!profile?.avatar_url) return
+    setIncarcPoza(true)
+    const vechi = caleAvatar(profile.avatar_url)
+    const { error } = await supabase.from('profiles').update({ avatar_url: null }).eq('id', profile.id)
+    if (!error && vechi) await supabase.storage.from('avatare').remove([vechi])
+    if (error) setMsgPoza({ text: 'Eroare: ' + error.message, tip: 'error' })
+    else { setProfile({ ...profile, avatar_url: null }); setUtilizatori(u => u.map(x => x.id === profile.id ? { ...x, avatar_url: null } : x)); setMsgPoza({ text: 'Poza a fost stearsa.', tip: 'success' }) }
+    setIncarcPoza(false)
   }
 
   async function schimbaRol(userId, rolNou, apartamentId) {
@@ -134,8 +177,26 @@ export default function Setari() {
 
         {/* CONTUL MEU */}
         <div style={{background:'var(--card)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderRadius:'var(--r)',padding:'16px',boxShadow:'var(--shadow)',border:'1px solid var(--border)'}}>
-          <div style={{fontFamily:'var(--font-display)',fontSize:14,fontWeight:500,marginBottom:4}}>Contul meu</div>
-          <div style={{fontSize:12,color:'var(--text3)',marginBottom:14}}>{profile?.nume} · {email}</div>
+          <div style={{fontFamily:'var(--font-display)',fontSize:14,fontWeight:500,marginBottom:14}}>Contul meu</div>
+          <div style={{display:'flex',alignItems:'center',gap:16,marginBottom:16}}>
+            <label style={{position:'relative',cursor:incarcPoza?'wait':'pointer',flexShrink:0}} title="Schimba poza">
+              <Avatar url={profile?.avatar_url} nume={profile?.nume} size={76} color={CULORI[((profile?.apartament_id||4)-1)%5]} style={{opacity:incarcPoza?0.5:1}} />
+              <span style={{position:'absolute',right:-2,bottom:-2,width:30,height:30,borderRadius:'50%',background:'var(--btn)',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 0 0 3px rgba(255,255,255,0.9)'}}><Icon name="poza" size={15} /></span>
+              <input type="file" accept="image/*" onChange={incarcaPoza} disabled={incarcPoza} style={{display:'none'}} />
+            </label>
+            <div style={{minWidth:0}}>
+              <div style={{fontSize:16,fontWeight:500}}>{profile?.nume}</div>
+              <div style={{fontSize:12,color:'var(--text3)',marginBottom:8,overflow:'hidden',textOverflow:'ellipsis'}}>{email}</div>
+              <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
+                <label style={{padding:'6px 12px',borderRadius:999,background:'#fff',fontSize:12,cursor:'pointer',color:'var(--t1)'}}>
+                  {incarcPoza ? 'Se incarca...' : profile?.avatar_url ? 'Schimba poza' : 'Adauga poza'}
+                  <input type="file" accept="image/*" onChange={incarcaPoza} disabled={incarcPoza} style={{display:'none'}} />
+                </label>
+                {profile?.avatar_url && <button onClick={stergePoza} disabled={incarcPoza} style={{padding:'6px 12px',background:'transparent',border:'1px solid rgba(11,37,69,0.25)',fontSize:12,cursor:'pointer',color:'var(--text2)'}}>Sterge</button>}
+              </div>
+            </div>
+          </div>
+          {msgPoza.text && <div style={{padding:'10px 12px',borderRadius:14,fontSize:12,marginBottom:12,background:msgPoza.tip === 'success' ? 'var(--t7)' : 'var(--err-bg)',color:msgPoza.tip === 'success' ? 'var(--t1)' : '#b91c1c'}}>{msgPoza.text}</div>}
           <div style={{fontSize:12,fontWeight:500,color:'var(--text2)',marginBottom:8}}>Schimba parola</div>
           <input type="password" autoComplete="new-password" placeholder="Parola noua (minim 8 caractere)" value={parola.noua} onChange={e => setParola({...parola, noua: e.target.value})} style={{width:'100%',padding:'11px',border:'1px solid rgba(29,28,27,0.08)',background:'var(--glass)',borderRadius:16,fontSize:15,fontFamily:'var(--font)',outline:'none',marginBottom:10}} />
           <input type="password" autoComplete="new-password" placeholder="Repeta parola noua" value={parola.confirma} onChange={e => setParola({...parola, confirma: e.target.value})} style={{width:'100%',padding:'11px',border:'1px solid rgba(29,28,27,0.08)',background:'var(--glass)',borderRadius:16,fontSize:15,fontFamily:'var(--font)',outline:'none',marginBottom:10}} />
@@ -157,9 +218,7 @@ export default function Setari() {
           <div style={{display:'flex',flexDirection:'column',gap:8}}>
             {utilizatori.map((util, i) => (
               <div key={util.id} style={{display:'flex',alignItems:'center',gap:10,padding:'10px 12px',background:'var(--bg)',borderRadius:'var(--r-sm)'}}>
-                <div style={{width:36,height:36,borderRadius:'50%',background:rolColors[util.rol] || '#94a3b8',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontWeight:600,fontSize:12,flexShrink:0}}>
-                  {util.nume.substring(0,2).toUpperCase()}
-                </div>
+                <Avatar url={util.avatar_url} nume={util.nume} size={40} color={rolColors[util.rol] || '#94a3b8'} />
                 <div style={{flex:1,minWidth:0}}>
                   <div style={{fontSize:13,fontWeight:500,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{util.nume}</div>
                   <div style={{fontSize:11,color:'var(--text3)'}}>{util.email}</div>
