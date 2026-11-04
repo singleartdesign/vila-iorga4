@@ -72,7 +72,7 @@ function RaportPdf() {
       <style>{`
         @page { size: A4; margin: 0; }
         body { background: #e9edf0; }
-        .pagina { width: 210mm; min-height: 297mm; margin: 16px auto; background: #fff; font-family: 'Nunito', sans-serif; color: ${INK}; box-shadow: 0 4px 24px rgba(0,0,0,.12); position: relative; }
+        .pagina { width: 210mm; min-height: 297mm; margin: 16px auto; background: #fff; font-family: var(--font); color: ${INK}; box-shadow: 0 4px 24px rgba(0,0,0,.12); position: relative; }
         .bara { position: sticky; top: 0; z-index: 5; display: flex; gap: 8px; justify-content: center; padding: 10px; background: #1f2a33; }
         .bara button, .bara a { padding: 8px 16px; border-radius: 8px; border: 0; font-weight: 800; font-size: 13px; cursor: pointer; text-decoration: none; font-family: inherit; }
         table { width: 100%; border-collapse: collapse; font-size: 11px; }
@@ -95,7 +95,7 @@ function RaportPdf() {
       <div style={{ background: T1, color: '#fff', padding: '26px 14mm 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
           <div style={{ fontFamily: 'var(--font)', fontSize: 24, fontWeight: 700 }}>Vila Iorga 4 · Apă rece</div>
-          <div style={{ fontSize: 14, marginTop: 4 }}>Consum {numeLuna} · citiri apometre din 24 {LUNI[luna.luna - 1]}</div>
+          <div style={{ fontSize: 14, marginTop: 4 }}>Consum {numeLuna} · citiri apometre din {luna.an * 12 + luna.luna >= 2026 * 12 + 11 ? 20 : 24} {LUNI[luna.luna - 1]}</div>
         </div>
         <div style={{ textAlign: 'right', fontSize: 11, lineHeight: 1.5 }}>Str. Nicolae Iorga nr. 4, Brașov<br />Administrator: Vlad Ștefan</div>
       </div>
@@ -170,7 +170,7 @@ function RaportPdf() {
           <strong>* Ajustare:</strong> {luna.mod_repartizare === 'special'
             ? <>diferența de {(dif >= 0 ? '+' : '−') + fmt(Math.abs(dif))} mc a fost atribuită integral unui singur apartament (decizie pentru luna aceasta). Total de plată = exact valoarea facturii.</>
             : luna.mod_repartizare === 'egal'
-              ? <>diferența de {(dif >= 0 ? '+' : '−') + fmt(Math.abs(dif))} mc se împarte egal la toate apartamentele. Total de plată = exact valoarea facturii.</>
+              ? <>diferența de {(dif >= 0 ? '+' : '−') + fmt(Math.abs(dif))} mc {dif > 0 ? '(apă trecută prin contorul general, dar neînregistrată de apometre) ' : ''}se împarte <strong>egal la toate cele {randuri.length} apartamente</strong>, inclusiv cele fără consum: {(dif >= 0 ? '+' : '−') + fmt(Math.abs(dif) / (randuri.length || 1))} mc fiecare, adică aproximativ {fmt(Math.abs(dif) / (randuri.length || 1) * (mc ? val / mc : 0))} lei. Total de plată = exact valoarea facturii.</>
               : <>diferența de {(dif >= 0 ? '+' : '−') + fmt(Math.abs(dif))} mc se împarte proporțional cu consumul fiecăruia (cine consumă mai mult preia o parte mai mare). Apartamentele fără consum nu plătesc diferențe. Total de plată = exact valoarea facturii.</>}
           {Math.abs(dif) > Math.max(2, mc * 0.1) && <><br /><strong style={{ color: '#a85a12' }}>Diferență mare luna aceasta: verific citirile și apometrele.</strong></>}
         </div>
@@ -190,7 +190,7 @@ function RaportPdf() {
             ING: <strong>RO92 INGB 0000 9999 0052 0242</strong> &nbsp;·&nbsp; Revolut: <strong>RO45 REVO 0000 1364 3298 8060</strong><br />
           </>}
           Vă rog să trimiteți pe grup o confirmare după plată.<br />
-          Citirile pentru luna următoare: pe 24, cu poză clară la apometru (cifrele negre și roșii), chiar dacă nu ați consumat.
+          Citirile pentru luna următoare: pe 20, introduse de fiecare în aplicație, cu poză clară la apometru (cifrele negre și roșii), chiar dacă nu ați consumat.
         </div>
       </div>
 
