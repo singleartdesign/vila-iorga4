@@ -61,10 +61,13 @@ export default function Citiri() {
 
   const esteAdmin = profile?.rol === 'administrator' || profile?.rol === 'manager'
 
+  // luna se inchide pentru proprietari cand e validata sau cand are deja factura
+  const lunaInchisa = !!lunaActuala?.validata || Number(lunaActuala?.consum_facturat) > 0
+
   function canEdit(apt) {
     if (!profile) return false
     if (esteAdmin) return true
-    if (profile.rol === 'proprietar' && profile.apartament_id === apt.id && !lunaActuala?.validata) return true
+    if (profile.rol === 'proprietar' && profile.apartament_id === apt.id && !lunaInchisa) return true
     return false
   }
 
@@ -195,9 +198,9 @@ export default function Citiri() {
           </div>
         )}
 
-        {lunaActuala?.validata ? (
+        {lunaInchisa ? (
           <div style={{padding:'12px 14px',borderRadius:12,background:'var(--l7)',border:'1px solid var(--l5)',color:'var(--l1)',fontSize:12,fontWeight:600}}>
-            <Icon name="lacat" size={16} style={{display:'inline-block',verticalAlign:'-3px',marginRight:6}} />Luna {lunaNume} e validata. Citirile nu mai pot fi modificate de proprietari.
+            <Icon name="lacat" size={16} style={{display:'inline-block',verticalAlign:'-3px',marginRight:6}} />Luna {lunaNume} {lunaActuala?.validata ? 'e validata' : 'are deja factura'}. Citirile nu mai pot fi modificate de proprietari; citirea noua se introduce in luna urmatoare.
           </div>
         ) : !esteAdmin && (
           <div style={{padding:'12px 14px',borderRadius:12,background:'var(--t7)',border:'1px solid var(--t5)',color:'var(--t1)',fontSize:12,fontWeight:600,lineHeight:1.5}}>

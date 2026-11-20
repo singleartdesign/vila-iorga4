@@ -84,8 +84,44 @@ export default function Facturi() {
       actualizat_la: new Date().toISOString()
     }).eq('id', lunaActuala.id)
     if (!error) { const { error: e2 } = await supabase.rpc('calculeaza_luna', { p_luna_id: lunaActuala.id }); if (e2) console.error(e2) }
+    if (!error) {
+      // deschide automat luna urmatoare, ca citirile noi sa nu ajunga peste luna facturata
+      const urm = lunaActuala.luna === 12 ? { an: lunaActuala.an + 1, luna: 1 } : { an: lunaActuala.an, luna: lunaActuala.luna + 1 }
+      const { data: exista } = await supabase.from('luni_facturare').select('id').eq('an', urm.an).eq('luna', urm.luna).maybeSingle()
+      if (!exista) await supabase.from('luni_facturare').insert({ ...urm, valoare_factura: 0, consum_facturat: 0, mod_repartizare: form.mod_repartizare, index_general_vechi: numOrNull(form.index_general_nou) })
+    }
     if (error) { setMsg('Eroare: ' + error.message); setMsgType('error') }
     else { setMsg('Factura salvata! Calculele au fost actualizate automat.'); setMsgType('success'); await loadData() }
+    setSaving(false)
+  }
+
+  // Admin: factura a fost platita la Compania Apa. Inchide luna, muta restantele/avansurile in luna urmatoare
+  async function marcheazaFacturaPlatita() {
+    if (!lunaActuala) return
+    if (!(Number(lunaActuala.consum_facturat) > 0)) { setMsg('Introdu intai factura.'); setMsgType('error'); return }
+    if (!window.confirm('Confirmi ca ai platit factura la Compania Apa? Luna se inchide, iar cine nu a platit integral apare cu restanta in luna urmatoare.')) return
+    setSaving(true)
+    try {
+      const urm = lunaActuala.luna === 12 ? { an: lunaActuala.an + 1, luna: 1 } : { an: lunaActuala.an, luna: lunaActuala.luna + 1 }
+      let { data: lunaUrm } = await supabase.from('luni_facturare').select('id').eq('an', urm.an).eq('luna', urm.luna).maybeSingle()
+      if (!lunaUrm) {
+        const r = await supabase.from('luni_facturare').insert({ ...urm, valoare_factura: 0, consum_facturat: 0, mod_repartizare: lunaActuala.mod_repartizare || 'egal', index_general_vechi: lunaActuala.index_general_nou }).select('id').single()
+        if (r.error) throw r.error
+        lunaUrm = r.data
+      }
+      const { data: pl, error: ep } = await supabase.from('plati').select('apartament_id, suma_calculata, sold_anterior, suma_platita').eq('luna_id', lunaActuala.id)
+      if (ep) throw ep
+      for (const p of pl || []) {
+        const rest = Math.round(((Number(p.suma_calculata) || 0) + (Number(p.sold_anterior) || 0) - (Number(p.suma_platita) || 0)) * 100) / 100
+        const { error: eu } = await supabase.from('plati').upsert({ luna_id: lunaUrm.id, apartament_id: p.apartament_id, sold_anterior: rest }, { onConflict: 'luna_id,apartament_id' })
+        if (eu) throw eu
+      }
+      const { error: el } = await supabase.from('luni_facturare').update({ factura_platita_la: new Date().toISOString(), validata: true, validata_la: lunaActuala.validata_la || new Date().toISOString() }).eq('id', lunaActuala.id)
+      if (el) throw el
+      const restante = (pl || []).filter(p => (Number(p.suma_calculata) || 0) + (Number(p.sold_anterior) || 0) - (Number(p.suma_platita) || 0) > 0.004).length
+      setMsg(`Factura marcata ca platita. Luna e inchisa, citirile s-au mutat pe luna urmatoare.${restante ? ` ${restante} ${restante === 1 ? 'apartament apare' : 'apartamente apar'} cu restanta.` : ''}`); setMsgType('success')
+      await loadData()
+    } catch (err) { setMsg('Eroare: ' + (err.message || err)); setMsgType('error') }
     setSaving(false)
   }
 
@@ -257,6 +293,16 @@ export default function Facturi() {
                 placeholder="ex: Teava sparta la Ap. 3, pierdere atribuita acestuia..."
               />
             </div>
+
+            {lunaActuala.factura_platita_la ? (
+              <div style={{padding:'11px 14px',marginBottom:10,borderRadius:999,background:'var(--t7)',border:'1px solid var(--t5)',color:'var(--t1)',fontSize:13,display:'flex',alignItems:'center',gap:8}}>
+                <Icon name="ok" size={16} />Factura achitata la Compania Apa pe {new Date(lunaActuala.factura_platita_la).toLocaleDateString('ro-RO')}
+              </div>
+            ) : Number(lunaActuala.consum_facturat) > 0 && (
+              <button className="btn-cta" onClick={marcheazaFacturaPlatita} disabled={saving} style={{width:'100%',marginBottom:10,background:'var(--btn)',border:'none',color:'#fff',cursor:'pointer'}}>
+                Am platit factura la Compania Apa
+              </button>
+            )}
 
             <button onClick={async () => {
               const v = !lunaActuala.validata
